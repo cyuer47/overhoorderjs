@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Registreren</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+  </head>
+  <body>
+    <div class="container card" style="max-width: 460px; margin: 40px auto">
+      <h2>Docent registreren</h2>
+      <div id="error" style="color: red"></div>
+      <form id="registerForm">
+        <label>Naam</label>
+        <input type="text" id="naam" name="naam" required />
+
+        <label>Email</label>
+        <input type="email" id="email" name="email" required />
+
+        <label>Wachtwoord</label>
+        <input type="password" id="wachtwoord" name="wachtwoord" required />
+
+        <label>Herhaal wachtwoord</label>
+        <input type="password" id="wachtwoord2" name="wachtwoord2" required />
+
+        <div style="margin-top: 12px">
+          <button class="btn-primary" type="submit">Account aanmaken</button>
+        </div>
+      </form>
+      <p class="helper">Al een account? <a href="login.html">Log in</a></p>
+    </div>
+    <script>
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const err = document.getElementById("error");
+          err.textContent = "";
+          const naam = document.getElementById("naam").value.trim();
+          const email = document.getElementById("email").value.trim();
+          const wachtwoord = document.getElementById("wachtwoord").value;
+          const wachtwoord2 = document.getElementById("wachtwoord2").value;
+
+          if (!naam || !email || !wachtwoord) {
+            err.textContent = "Vul alle velden in.";
+            return;
+          }
+          if (wachtwoord !== wachtwoord2) {
+            err.textContent = "Wachtwoorden komen niet overeen.";
+            return;
+          }
+
+          try {
+            const res = await fetch("/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ naam, email, password: wachtwoord }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+              err.textContent = data.error || "Registratie mislukt";
+              return;
+            }
+            if (data.token) localStorage.setItem("token", data.token);
+            window.location.href = "/dashboard.html";
+          } catch (e) {
+            err.textContent = "Netwerkfout";
+          }
+        });
+    </script>
+  </body>
+</html>

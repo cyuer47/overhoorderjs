@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+  </head>
+  <body>
+    <div class="container">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <div class="chip">Overhoorder • Docent</div>
+        <div class="profile-container">
+          <button class="profile-btn" onclick="toggleProfileMenu()">
+            <img id="avatar" src="" alt="Avatar" class="profile-avatar" />
+            <span id="profile-name" class="profile-name"></span>
+            <svg
+              class="dropdown-arrow"
+              xmlns="http://www.w3.org/2000/svg"
+              height="20"
+              viewBox="0 0 24 24"
+              width="20"
+              fill="#1f1f1f"
+            >
+              <path d="M7 10l5 5 5-5H7z" />
+            </svg>
+          </button>
+          <div class="profile-menu">
+            <a href="profile.html">Mijn profiel</a>
+            <a href="settings.html">Instellingen</a>
+            <a href="#" id="logout-link" class="logout-btn">Uitloggen</a>
+          </div>
+        </div>
+      </div>
+
+      <h1 class="app-title">Dashboard</h1>
+
+      <div class="card">
+        <h3>Nieuwe klas</h3>
+        <form id="createKlasForm">
+          <label>Klasnaam</label
+          ><input name="klas_naam" id="klas_naam" required />
+          <label>Vak (optioneel)</label><input name="vak" id="vak" />
+          <div style="margin-top: 12px">
+            <button class="btn-primary" type="submit">Klas aanmaken</button>
+          </div>
+        </form>
+      </div>
+
+      <div style="height: 16px"></div>
+
+      <div class="card">
+        <h3>Uw klassen</h3>
+        <div id="klassenList"></div>
+      </div>
+
+      <div style="height: 16px"></div>
+
+      <div class="card">
+        <h3>Vragenlijstbibliotheek</h3>
+        <p class="helper">
+          Gebruik bestaande vragenlijsten of voeg ze toe aan je klas.
+        </p>
+        <div id="biblioList"></div>
+      </div>
+
+      <div style="height: 16px"></div>
+
+      <div class="card">
+        <h3>Boekenlicenties</h3>
+        <div id="boekenList"></div>
+      </div>
+
+      <div style="height: 16px"></div>
+
+      <div class="card">
+        <h3>Licenties</h3>
+        <div id="licentiesList"></div>
+      </div>
+
+      <div style="height: 16px"></div>
+
+      <div class="card">
+        <h3>Zoeken</h3>
+        <p class="helper">Zoek naar elk publieke profiel!</p>
+        <input type="text" id="search" placeholder="Zoek een docent" />
+        <ul id="results"></ul>
+      </div>
+    </div>
+
+    <script>
+      async function fetchDashboard() {
+        const token = localStorage.getItem("token");
+        if (!token) return (window.location = "login.html");
+        try {
+          const res = await fetch("/dashboard-data", {
+            headers: { Authorization: "Bearer " + token },
+          });
+          if (!res.ok) {
+            if (res.status === 401 || res.status === 403) {
+              localStorage.removeItem("token");
+              return (window.location = "login.html");
+            }
+            throw new Error("Dashboard load failed");
+          }
+          const j = await res.json();
+
+          document.getElementById("profile-name").textContent =
+            j.docent?.naam || j.docent?.email || "Docent";
+          document.getElementById("avatar").src =
+            "get_avatar.php?file=" +
+            encodeURIComponent(j.docent?.avatar || "") +
+            "&seed=" +
+            encodeURIComponent(j.docent?.naam || "") +
+            "&size=48";
+
+          // klassen
+          const kl = document.getElementById("klassenList");
+          kl.innerHTML = "";
+          if (!j.klassen || j.klassen.length === 0)
+            kl.innerHTML = '<p class="helper">Nog geen klassen.</p>';
+          else {
+            const ul = document.createElement("ul");
+            j.klassen.forEach((k) => {
+              const li = document.createElement("li");
+              li.style.margin = "10px 0";
+              li.innerHTML = `<strong>${escapeHtml(
+                k.naam
+              )}</strong><div class="helper">Klascode: ${escapeHtml(
+                k.klascode
+              )} - Vak: ${escapeHtml(k.vak || "")}</div>`;
+              const div = document.createElement("div");
+              div.style.marginTop = "8px";
+              div.style.padding = "5px";
+              div.innerHTML = `<a class="btn-secondary" href="manage_klas.html?klas=${k.id}">Beheren</a> <a class="btn-primary" href="start_sessie.html?klas=${k.id}">Start overhoring</a> <a class="btn-danger" href="manage_klas.html?klas=${k.id}" onclick="if(!confirm('Weet je zeker dat je deze klas wilt verwijderen? Alle leerlingen, vragen en resultaten zullen ook worden verwijderd.')) return false; deleteKlas(${k.id}); return false;">Verwijderen</a>`;
+              li.appendChild(div);
+              ul.appendChild(li);
+            });
+            kl.appendChild(ul);
+          }
+
+          // bibliotheek
+          const bl = document.getElementById("biblioList");
+          bl.innerHTML = "";
+          if (!j.biblio_lijsten || j.biblio_lijsten.length === 0)
+            bl.innerHTML =
+              '<p class="helper">Nog geen vragenlijsten in de bibliotheek.</p>';
+          else {
+            const ul = document.createElement("ul");
+            j.biblio_lijsten.forEach((b) => {
+              const li = document.createElement("li");
+              li.style.margin = "10px 0";
+              li.innerHTML = `<strong>${escapeHtml(
+                b.naam
+              )}</strong><div class="helper">${escapeHtml(
+                b.beschrijving || ""
+              )}</div>`;
+              const div = document.createElement("div");
+              div.style.marginTop = "8px";
+              div.style.padding = "5px";
+              let lic_type = b.licentie_type || "gratis";
+              let mag = lic_type === "gratis";
+              if (!mag && j.licenties) {
+                for (const L of j.licenties) {
+                  if (L.type === lic_type || L.type === "premium") {
+                    mag = true;
+                    break;
+                  }
+                }
+              }
+              if (mag)
+                div.innerHTML = `<a class="btn-primary" href="gebruik_bibliotheek.php?id=${b.id}">Toevoegen aan klas</a>`;
+              else
+                div.innerHTML = `<button class="btn-secondary" disabled title="Licentie vereist">Licentie vereist (${escapeHtml(
+                  lic_type
+                )})</button>`;
+              li.appendChild(div);
+              ul.appendChild(li);
+            });
+            bl.appendChild(ul);
+          }
+
+          // boeken
+          const bo = document.getElementById("boekenList");
+          bo.innerHTML = "";
+          if (!j.boeken || j.boeken.length === 0)
+            bo.innerHTML =
+              '<p class="helper">Nog geen boeken beschikbaar. Activeer eerst een licentie om boeken te ontgrendelen.</p>';
+          else {
+            const ul = document.createElement("ul");
+            j.boeken.forEach((b) => {
+              const li = document.createElement("li");
+              li.style.margin = "10px 0";
+              li.innerHTML = `<strong>${escapeHtml(
+                b.titel
+              )}</strong><div class="helper">${escapeHtml(
+                b.omschrijving || ""
+              )}</div>`;
+              const div = document.createElement("div");
+              div.style.marginTop = "8px";
+              div.style.padding = "5px";
+              const a = document.createElement("a");
+              a.className = "btn-primary";
+              a.href = "#";
+              a.textContent = "Open boek";
+              a.addEventListener("click", (e) => {
+                e.preventDefault();
+                openBook(b.id);
+              });
+              div.appendChild(a);
+              li.appendChild(div);
+              ul.appendChild(li);
+            });
+            bo.appendChild(ul);
+          }
+
+          // licenties
+          const liEl = document.getElementById("licentiesList");
+          liEl.innerHTML = "";
+          liEl.innerHTML = `<p class="helper">Je hebt momenteel ${j.licenties.length} actieve licentie(s).</p>`;
+          if (j.licenties.length) {
+            const ul2 = document.createElement("ul");
+            j.licenties.forEach((L) => {
+              const li = document.createElement("li");
+              li.innerHTML = `<strong>${escapeHtml(
+                L.type
+              )}</strong> - vervalt op ${escapeHtml(
+                L.vervalt_op || "geen vervaldatum"
+              )}`;
+              ul2.appendChild(li);
+            });
+            liEl.appendChild(ul2);
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Kon dashboard niet laden");
+        }
+      }
+
+      function escapeHtml(s) {
+        if (!s) return "";
+        return String(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[c])
+        );
+      }
+
+      // create klas
+      document
+        .getElementById("createKlasForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const token = localStorage.getItem("token");
+          if (!token) return (window.location = "login.html");
+          const naam = document.getElementById("klas_naam").value.trim();
+          const vak = document.getElementById("vak").value.trim();
+          if (!naam) return alert("Vul een klasnaam in");
+          try {
+            const res = await fetch("/create-klas", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token,
+              },
+              body: JSON.stringify({ naam, vak }),
+            });
+            if (!res.ok) {
+              const j = await res.json().catch(() => ({}));
+              alert(j.error || "Kon klas niet aanmaken");
+              return;
+            }
+            document.getElementById("klas_naam").value = "";
+            document.getElementById("vak").value = "";
+            fetchDashboard();
+          } catch (err) {
+            alert("Netwerkfout");
+          }
+        });
+
+      // open book
+      async function openBook(bookId) {
+        const token = localStorage.getItem("token");
+        if (!token) return (window.location = "login.html");
+        try {
+          const res = await fetch("/open-ebook", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({ id: bookId }),
+          });
+          if (!res.ok) {
+            const j = await res.json().catch(() => ({}));
+            alert(j.error || "Kon boek niet openen");
+            return;
+          }
+          window.location = "ebook_viewer.html";
+        } catch (err) {
+          alert("Netwerkfout");
+        }
+      }
+
+      // search
+      let searchTimer;
+      document.getElementById("search").addEventListener("input", (e) => {
+        const q = e.target.value.trim();
+        const ul = document.getElementById("results");
+        ul.innerHTML = "";
+        if (!q) return;
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(async () => {
+          try {
+            const res = await fetch("/search?q=" + encodeURIComponent(q));
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            ul.innerHTML = "";
+            if (!data || data.length === 0) {
+              ul.innerHTML = "<li>Geen resultaten gevonden.</li>";
+              return;
+            }
+            data.forEach((p) => {
+              const li = document.createElement("li");
+              const a = document.createElement("a");
+              a.href = "profile.php?id=" + p.id;
+              a.textContent = `${p.naam} (${p.badge || ""})`;
+              li.appendChild(a);
+              ul.appendChild(li);
+            });
+          } catch (err) {
+            console.error(err);
+          }
+        }, 250);
+      });
+
+      // profile menu
+      function toggleProfileMenu() {
+        const container = document.querySelector(".profile-container");
+        container.classList.toggle("active");
+      }
+      document.addEventListener("click", function (e) {
+        const container = document.querySelector(".profile-container");
+        if (container && !container.contains(e.target))
+          container.classList.remove("active");
+      });
+
+      // logout
+      document.getElementById("logout-link").addEventListener("click", () => {
+        localStorage.removeItem("token");
+        window.location = "login.html";
+      });
+
+      // delete klas helper
+      async function deleteKlas(klasId) {
+        const token = localStorage.getItem("token");
+        if (!token) return (window.location = "login.html");
+        try {
+          const res = await fetch("/delete-klas", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({ id: klasId }),
+          });
+          if (!res.ok) throw new Error("Kon klas niet verwijderen");
+          fetchDashboard();
+        } catch (err) {
+          alert("Fout: " + err.message);
+        }
+      }
+
+      fetchDashboard();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Vragen</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.6);
+      }
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 420px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      .modal-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .modal-buttons button {
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 20px;
+        border: none;
+        cursor: pointer;
+      }
+      .btn-good {
+        background: #4caf50;
+        color: white;
+      }
+      .btn-typo {
+        background: #2196f3;
+        color: white;
+      }
+      .btn-wrong {
+        background: #f44336;
+        color: white;
+      }
+      .score-board {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+      }
+      .current-question {
+        background: #e3f2fd;
+        padding: 20px;
+        border-radius: 12px;
+        border-left: 4px solid #2196f3;
+      }
+      .helper {
+        color: #666;
+      }
+      .small-muted {
+        color: #777;
+        font-size: 0.9em;
+      }
+      /* presence indicator */
+      .presence-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+      }
+      .presence-on {
+        background: #4caf50;
+      }
+      .presence-away {
+        background: #ffc107;
+      }
+      .presence-off {
+        background: #bbb;
+      }
+      .student-away {
+        opacity: 0.65;
+        filter: grayscale(40%);
+      }
+      .student-focused {
+        font-weight: 700;
+      }
+      .last-seen {
+        font-size: 0.85em;
+        color: #666;
+        margin-left: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a class="btn-text" href="dashboard.html"
+        ><svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="var(--svg-icons)"
+        >
+          <path
+            d="m368-417 202 202-90 89-354-354 354-354 90 89-202 202h466v126H368Z"
+          /></svg
+      ></a>
+      <h1 class="app-title">Overhoring</h1>
+      <div
+        id="klass-info"
+        style="text-align: center; margin-bottom: 20px"
+      ></div>
+
+      <div class="card">
+        <h3>Vraag Beheer</h3>
+        <div id="status-area"></div>
+        <div style="margin-top: 12px">
+          <button id="btn-clear" class="btn-danger" style="display: none">
+            Stop huidige vraag
+          </button>
+          <button id="btn-next" class="btn-primary">Volgende vraag</button>
+          <a
+            id="cast-link"
+            class="btn-primary"
+            href="#"
+            target="_blank"
+            style="display: none"
+            >Toon castscherm (voor projectie)</a
+          >
+        </div>
+        <div style="margin-top: 12px">
+          <a id="stop-session" class="btn-danger" href="#" style="display: none"
+            >Stop sessie</a
+          >
+        </div>
+      </div>
+
+      <div style="height: 16px"></div>
+
+      <div class="card">
+        <h3>Scorebord</h3>
+        <div class="score-board" id="scoreboard-container"></div>
+      </div>
+
+      <div style="height: 16px"></div>
+
+      <div class="card">
+        <h3>Vragen toevoegen</h3>
+        <form id="addQuestionForm">
+          <label>Vraag</label><input name="vraag" required />
+          <label>Antwoord</label><input name="antwoord" required />
+          <div style="margin-top: 12px">
+            <button class="btn-secondary" type="submit">Opslaan</button>
+          </div>
+        </form>
+      </div>
+
+      <div style="height: 16px"></div>
+
+      <div class="card">
+        <h3>
+          Recente antwoorden
+          <span
+            id="pending-count"
+            style="
+              display: none;
+              margin-left: 10px;
+              padding: 4px 8px;
+              border-radius: 10px;
+              background: #ffc107;
+              color: #111;
+              font-weight: 700;
+              font-size: 0.9em;
+            "
+          ></span>
+        </h3>
+        <div id="recent-answers-container"></div>
+      </div>
+
+      <div style="height: 16px"></div>
+
+      <div class="card">
+        <h3>Leerlingen in de sessie</h3>
+        <div
+          id="presence-summary"
+          class="small-muted"
+          style="margin-bottom: 8px"
+        >
+          Online: 0
+        </div>
+        <div id="students-list-container"></div>
+      </div>
+    </div>
+
+    <div id="gradeModal" class="modal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()" aria-label="Close">
+          ✖
+        </button>
+        <h4>Beoordeel antwoord</h4>
+        <div style="text-align: left; margin-top: 20px">
+          <p>
+            <strong>Gegeven antwoord:</strong>
+            <span id="modalStudentAnswer"></span>
+          </p>
+          <p>
+            <strong>Correct antwoord:</strong>
+            <span id="modalCorrectAnswer"></span>
+          </p>
+        </div>
+        <p style="margin-top: 20px">Selecteer de status voor dit antwoord:</p>
+        <div class="modal-buttons">
+          <button class="btn-good" onclick="gradeModalSubmit('goed')">
+            ✅ Goed (10 punten)
+          </button>
+          <button class="btn-typo" onclick="gradeModalSubmit('typfout')">
+            📝 Typfout (5 punten)
+          </button>
+          <button class="btn-wrong" onclick="gradeModalSubmit('fout')">
+            ❌ Fout (0 punten)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get("sessie");
+      if (!sessionId) {
+        document.body.innerHTML =
+          '<div class="container"><h2>Geen sessie geselecteerd.</h2></div>';
+        throw new Error("sessie param required");
+      }
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location =
+          "login.html?redirecturi=" +
+          encodeURIComponent("vraag_handler.html?sessie=" + sessionId);
+      }
+
+      const headers = {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      };
+
+      async function loadSession() {
+        try {
+          const res = await fetch("/sessies/" + sessionId, { headers });
+          if (!res.ok) throw new Error("Failed to load session");
+          const data = await res.json();
+          const sess = data.sess;
+          document.querySelector(".app-title").textContent =
+            "Overhoring - " + (sess.klasnaam || "");
+          document.getElementById("klass-info").innerHTML =
+            '<span class="chip">Klascode: <strong>' +
+            (sess.klascode || "") +
+            "</strong></span>";
+
+          const statusArea = document.getElementById("status-area");
+          if (sess.current_question_id && data.currentQuestion) {
+            statusArea.innerHTML = `<div class="current-question"><h4>Huidige vraag voor alle leerlingen:</h4><p style='font-size:18px;font-weight:bold;margin:10px 0;'>${escapeHtml(
+              data.currentQuestion.vraag
+            )} <span id='answerCount' style='color:#555'>(Antwoorden: ${
+              data.answerCount
+            })</span></p><p class='helper'>Alle leerlingen kunnen nu deze vraag beantwoorden.</p></div>`;
+            document.getElementById("btn-clear").style.display = "inline-block";
+          } else if (params.get("status") === "no_more_questions") {
+            statusArea.innerHTML = `<div class='current-question' style='background:#fff3cd;border-color:#ffe066;'><h4>Let op:</h4><p style='font-size:16px;font-weight:bold;margin:10px 0;'>Alle vragen zijn beantwoord! Voeg nieuwe vragen toe of beëindig de sessie.</p></div>`;
+            document.getElementById("btn-clear").style.display = "none";
+          } else {
+            statusArea.innerHTML =
+              '<p class="helper">Geen actieve vraag. Verstuur een vraag naar alle leerlingen.</p>';
+            document.getElementById("btn-clear").style.display = "none";
+          }
+
+          document.getElementById("cast-link").href =
+            "cast.html?sessie=" + sessionId;
+          document.getElementById("cast-link").style.display = "inline-block";
+
+          // Show and wire up the Stop Session button when sessie is active
+          const stopEl = document.getElementById("stop-session");
+          if (sess.actief) {
+            stopEl.style.display = "inline-block";
+            stopEl.href = "#";
+            stopEl.onclick = async (e) => {
+              e.preventDefault();
+              if (
+                !confirm("Stop huidige sessie? Dit logt alle leerlingen uit.")
+              )
+                return;
+              try {
+                const res = await fetch(`/sessies/${sessionId}/stop`, {
+                  method: "POST",
+                  headers,
+                });
+                const j = await res.json();
+                if (j.ok) {
+                  alert("Sessie gestopt");
+                  await loadSession();
+                  await refreshRecentAnswers();
+                  await refreshScoreboard();
+                } else {
+                  alert(j.error || "Kon sessie niet stoppen");
+                }
+              } catch (err) {
+                console.error(err);
+                alert("Fout bij stoppen sessie");
+              }
+            };
+          } else {
+            stopEl.style.display = "none";
+            stopEl.onclick = null;
+          }
+
+          // fill students immediately
+          renderStudents(data.leerlingen || []);
+        } catch (err) {
+          console.error("Failed loading session", err);
+        }
+      }
+
+      async function sendQuestion() {
+        try {
+          const res = await fetch("/sessies/" + sessionId + "/send_question", {
+            method: "POST",
+            headers,
+          });
+          const data = await res.json();
+          if (!data.ok && data.no_more) {
+            alert("Geen vragen meer beschikbaar.");
+            window.location =
+              "vraag_handler.html?sessie=" +
+              sessionId +
+              "&status=no_more_questions";
+            return;
+          }
+          await loadSession();
+          await refreshRecentAnswers();
+          await refreshScoreboard();
+        } catch (err) {
+          console.error(err);
+          alert("Fout bij versturen vraag");
+        }
+      }
+
+      async function clearQuestion() {
+        try {
+          await fetch("/sessies/" + sessionId + "/clear_question", {
+            method: "POST",
+            headers,
+          });
+          await loadSession();
+        } catch (err) {
+          console.error(err);
+          alert("Fout bij clear");
+        }
+      }
+
+      document.getElementById("btn-next").addEventListener("click", (e) => {
+        e.preventDefault();
+        sendQuestion();
+      });
+      document.getElementById("btn-clear").addEventListener("click", (e) => {
+        e.preventDefault();
+        if (!confirm("Stop huidige vraag?")) return;
+        clearQuestion();
+      });
+
+      // Add question
+      document
+        .getElementById("addQuestionForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const v = form.vraag.value.trim();
+          const a = form.antwoord.value.trim();
+          if (!v || !a) return alert("Vraag en antwoord zijn verplicht");
+          // need vragenlijst_id -> fetch session to find it
+          try {
+            const sres = await fetch("/sessies/" + sessionId, { headers });
+            if (!sres.ok) throw new Error("sessie not found");
+            const sdata = await sres.json();
+            const vlist = sdata.sess.vragenlijst_id;
+            const res = await fetch("/vragenlijst/" + vlist + "/vraag", {
+              method: "POST",
+              headers,
+              body: JSON.stringify({ vraag: v, antwoord: a, punten: 0 }),
+            });
+            const j = await res.json();
+            if (j.ok) {
+              form.vraag.value = "";
+              form.antwoord.value = "";
+              alert("Vraag toegevoegd");
+            }
+            await loadSession();
+          } catch (err) {
+            console.error(err);
+            alert("Fout bij toevoegen vraag");
+          }
+        });
+
+      // Scoreboard
+      async function refreshScoreboard() {
+        try {
+          const res = await fetch("/sessies/" + sessionId + "/scoreboard", {
+            headers,
+          });
+          if (!res.ok) throw new Error("scoreboard failed");
+          const data = await res.json();
+          const container = document.getElementById("scoreboard-container");
+          if (!data.rows || data.rows.length === 0) {
+            container.innerHTML = '<p class="helper">Geen scores gevonden.</p>';
+            return;
+          }
+          const html = data.rows
+            .map(
+              (r) =>
+                `<div class="score-item"><div>${escapeHtml(
+                  r.naam
+                )}</div><div style="font-weight:bold">${r.points}</div></div>`
+            )
+            .join("");
+          container.innerHTML = html;
+        } catch (err) {
+          console.error(err);
+          document.getElementById("scoreboard-container").innerHTML =
+            '<p class="helper" style="color:red">Fout bij laden scorebord.</p>';
+        }
+      }
+
+      // Recent answers
+      async function refreshRecentAnswers() {
+        try {
+          const res = await fetch("/sessies/" + sessionId + "/recent-answers", {
+            headers,
+          });
+          if (!res.ok) throw new Error("recent answers failed");
+          const data = await res.json();
+          const container = document.getElementById("recent-answers-container");
+          if (!data.rows || data.rows.length === 0) {
+            container.innerHTML =
+              '<p class="helper">Geen recente antwoorden.</p>';
+            return;
+          }
+          const html = data.rows
+            .map((r) => {
+              const needsReview = !r.status || r.status === "onbekend";
+              const gradeBtn = needsReview
+                ? `<button class="btn-secondary" onclick='openModal(${
+                    r.id
+                  }, ${JSON.stringify(r.antwoord)}, ${JSON.stringify(
+                    r.vraag
+                  )})'>Beoordeel</button>`
+                : "";
+              const statusLabel = needsReview
+                ? '<strong style="color:#d48806">Onbeoordeeld</strong>'
+                : `<span style="color:#4caf50">${escapeHtml(
+                    r.status || "beoordeeld"
+                  )}</span>`;
+              return `<div style="padding:8px;border-bottom:1px solid #eee"><div><strong>${escapeHtml(
+                r.leerling
+              )}</strong> <span class="small-muted">(${
+                r.created_at
+              })</span></div><div>${escapeHtml(
+                r.antwoord
+              )}</div><div style="margin-top:6px">Status: ${statusLabel} ${gradeBtn}</div></div>`;
+            })
+            .join("");
+          container.innerHTML = html;
+        } catch (err) {
+          console.error(err);
+          document.getElementById("recent-answers-container").innerHTML =
+            '<p style="color:red;">Fout bij laden recente antwoorden.</p>';
+        }
+      }
+
+      function renderStudents(list) {
+        const container = document.getElementById("students-list-container");
+        const summary = document.getElementById("presence-summary");
+        if (!list || list.length === 0) {
+          container.innerHTML =
+            '<p class="helper">Geen leerlingen in deze klas.</p>';
+          if (summary) summary.textContent = "Online: 0 / 0";
+          return;
+        }
+
+        let onlineCount = 0;
+        const html = list
+          .map((l) => {
+            const online = !!l.online;
+            const focused = !!l.focused;
+            if (online) onlineCount++;
+            const dotClass = online
+              ? "presence-dot presence-on"
+              : l.last_seen
+              ? "presence-dot presence-away"
+              : "presence-dot presence-off";
+            const nameClass = !focused ? "student-away" : "student-focused";
+            const lastSeenText = l.last_seen
+              ? ` (laatst: ${new Date(l.last_seen).toLocaleTimeString()})`
+              : "";
+            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #eee"><div><span class='${dotClass}'></span><span class='${nameClass}'>${escapeHtml(
+              l.naam
+            )}</span><span class='last-seen'>${lastSeenText}</span></div><div><button class="btn-danger" onclick="deleteStudent(${
+              l.id
+            })">Verwijder</button></div></div>`;
+          })
+          .join("");
+        container.innerHTML = html;
+        if (summary)
+          summary.textContent = `Online: ${onlineCount} / ${list.length}`;
+      }
+
+      // Render session details (populated from SSE payload)
+      function renderSessDetails(sess) {
+        const container = document.getElementById("sess-details");
+        if (!container) return;
+        if (!sess || Object.keys(sess).length === 0) {
+          container.innerHTML =
+            '<p class="helper">Geen sessie data beschikbaar.</p>';
+          return;
+        }
+        const rows = [
+          ["ID", sess.id],
+          ["Klas ID", sess.klas_id],
+          ["Klasnaam", sess.klasnaam],
+          ["Klascode", sess.klascode],
+          ["Vragenlijst ID", sess.vragenlijst_id],
+          ["Actief", sess.actief ? "Ja" : "Nee"],
+          ["Totaal leerlingen", sess.total_students || "0"],
+          ["Started at", sess.started_at || ""],
+          ["Current question id", sess.current_question_id || ""],
+          ["Question start time", sess.question_start_time || ""],
+          [
+            "Round seen",
+            Array.isArray(sess.round_seen)
+              ? JSON.stringify(sess.round_seen)
+              : sess.round_seen || "",
+          ],
+          ["Created at", sess.created_at || ""],
+        ];
+        container.innerHTML =
+          '<table style="width:100%;border-collapse:collapse;">' +
+          rows
+            .map(
+              (r) =>
+                `<tr><td style="padding:6px;font-weight:bold;width:40%">${
+                  r[0]
+                }</td><td style="padding:6px">${r[1] || ""}</td></tr>`
+            )
+            .join("") +
+          "</table>";
+      }
+
+      async function refreshStudentList() {
+        try {
+          const res = await fetch("/sessies/" + sessionId, { headers });
+          if (!res.ok) throw new Error("students failed");
+          const d = await res.json();
+          renderStudents(d.leerlingen || []);
+          const span = document.getElementById("answerCount");
+          if (span) span.textContent = `(Antwoorden: ${d.answerCount})`;
+        } catch (err) {
+          console.error("refreshStudentList", err);
+        }
+      }
+
+      async function deleteStudent(id) {
+        if (!confirm("Leerling verwijderen en resultaten verwijderen?")) return;
+        try {
+          const res = await fetch("/sessies/" + sessionId + "/leerling/" + id, {
+            method: "DELETE",
+            headers,
+          });
+          const j = await res.json();
+          if (j.ok) {
+            await refreshStudentList();
+            await refreshScoreboard();
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Kon leerling niet verwijderen");
+        }
+      }
+
+      // Modal
+      let currentModalResultId = null;
+      function openModal(resultId, studentAnswerJson, correctAnswerJson) {
+        // Accept either JSON-encoded strings or raw strings
+        let studentAnswer = "";
+        let correctAnswer = "";
+        try {
+          studentAnswer = studentAnswerJson
+            ? JSON.parse(studentAnswerJson)
+            : "";
+        } catch (e) {
+          studentAnswer = studentAnswerJson || "";
+        }
+        try {
+          correctAnswer = correctAnswerJson
+            ? JSON.parse(correctAnswerJson)
+            : "";
+        } catch (e) {
+          correctAnswer = correctAnswerJson || "";
+        }
+        currentModalResultId = resultId;
+        document.getElementById("gradeModal").style.display = "block";
+        document.getElementById("modalStudentAnswer").innerText = studentAnswer;
+        document.getElementById("modalCorrectAnswer").innerText = correctAnswer;
+      }
+      function closeModal() {
+        document.getElementById("gradeModal").style.display = "none";
+        currentModalResultId = null;
+      }
+      async function gradeModalSubmit(status) {
+        if (!currentModalResultId) return;
+        try {
+          const res = await fetch("/grade-answer", {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+              resultaat_id: currentModalResultId,
+              status,
+            }),
+          });
+          const j = await res.json();
+          if (j.ok) {
+            closeModal();
+            await refreshRecentAnswers();
+            await refreshScoreboard();
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Fout bij beoordelen");
+        }
+      }
+
+      window.onclick = function (event) {
+        const modal = document.getElementById("gradeModal");
+        if (event.target == modal) closeModal();
+      };
+
+      function escapeHtml(s) {
+        if (!s) return "";
+        return s.replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[c])
+        );
+      }
+
+      // Use Server-Sent Events (no polling)
+      let currentSess = null;
+      function applySessionData(data) {
+        try {
+          const sess = data.sess;
+          currentSess = sess;
+          document.querySelector(".app-title").textContent =
+            "Overhoring - " + (sess.klasnaam || "");
+          document.getElementById("klass-info").innerHTML =
+            '<span class="chip">Klascode: <strong>' +
+            (sess.klascode || "") +
+            "</strong></span>";
+
+          const statusArea = document.getElementById("status-area");
+          if (sess.current_question_id && data.currentQuestion) {
+            statusArea.innerHTML = `<div class="current-question"><h4>Huidige vraag voor alle leerlingen:</h4><p style='font-size:18px;font-weight:bold;margin:10px 0;'>${escapeHtml(
+              data.currentQuestion.vraag
+            )} <span id='answerCount' style='color:#555'>(Antwoorden: ${
+              data.answerCount
+            })</span></p><p class='helper'>Alle leerlingen kunnen nu deze vraag beantwoorden.</p></div>`;
+            document.getElementById("btn-clear").style.display = "inline-block";
+          } else if (params.get("status") === "no_more_questions") {
+            statusArea.innerHTML = `<div class='current-question' style='background:#fff3cd;border-color:#ffe066;'><h4>Let op:</h4><p style='font-size:16px;font-weight:bold;margin:10px 0;'>Alle vragen zijn beantwoord! Voeg nieuwe vragen toe of beëindig de sessie.</p></div>`;
+            document.getElementById("btn-clear").style.display = "none";
+          } else {
+            statusArea.innerHTML =
+              '<p class="helper">Geen actieve vraag. Verstuur een vraag naar alle leerlingen.</p>';
+            document.getElementById("btn-clear").style.display = "none";
+          }
+
+          document.getElementById("cast-link").href =
+            "cast.html?sessie=" + sessionId;
+          document.getElementById("cast-link").style.display = "inline-block";
+
+          // students
+          renderStudents(data.leerlingen || []);
+
+          // sessiedetails
+          renderSessDetails(data.sess || {});
+
+          // scoreboard
+          const container = document.getElementById("scoreboard-container");
+          if (!data.scoreboard || data.scoreboard.length === 0)
+            container.innerHTML = '<p class="helper">Geen scores gevonden.</p>';
+          else
+            container.innerHTML = data.scoreboard
+              .map(
+                (r) =>
+                  `<div class="score-item"><div>${escapeHtml(
+                    r.naam
+                  )}</div><div style="font-weight:bold">${r.points}</div></div>`
+              )
+              .join("");
+
+          // recent answers
+          const raContainer = document.getElementById(
+            "recent-answers-container"
+          );
+          if (!data.recentAnswers || data.recentAnswers.length === 0)
+            raContainer.innerHTML =
+              '<p class="helper">Geen recente antwoorden.</p>';
+          else
+            raContainer.innerHTML = data.recentAnswers
+              .map((r) => {
+                const needsReview = !r.status || r.status === "onbekend";
+                const gradeBtn = needsReview
+                  ? `<button class="btn-secondary" onclick='openModal(${
+                      r.id
+                    }, ${JSON.stringify(r.antwoord)}, ${JSON.stringify(
+                      r.vraag
+                    )})'>Beoordeel</button>`
+                  : "";
+                const statusLabel = needsReview
+                  ? '<strong style="color:#d48806">Onbeoordeeld</strong>'
+                  : `<span style="color:#4caf50">${escapeHtml(
+                      r.status || "beoordeeld"
+                    )}</span>`;
+                return `<div style="padding:8px;border-bottom:1px solid #eee"><div><strong>${escapeHtml(
+                  r.leerling
+                )}</strong> <span class="small-muted">(${
+                  r.created_at
+                })</span></div><div>${escapeHtml(
+                  r.antwoord
+                )}</div><div style="margin-top:6px">Status: ${statusLabel} ${gradeBtn}</div></div>`;
+              })
+              .join("");
+
+          const span = document.getElementById("answerCount");
+          if (span) span.textContent = `(Antwoorden: ${data.answerCount})`;
+
+          // show pending count if present
+          const pcEl = document.getElementById("pending-count");
+          if (pcEl) {
+            const pc = data.pending_count || 0;
+            if (pc > 0) {
+              pcEl.textContent = `Beoordeel: ${pc}`;
+              pcEl.style.display = "inline-block";
+            } else {
+              pcEl.style.display = "none";
+            }
+          }
+        } catch (err) {
+          console.error("applySessionData error", err);
+        }
+      }
+
+      // open SSE
+      const es = new EventSource(
+        "/sessies/" + sessionId + "/stream?token=" + encodeURIComponent(token)
+      );
+      es.addEventListener("open", () => {
+        console.log("SSE open");
+      });
+      es.addEventListener("error", (e) => {
+        console.error("SSE error", e);
+      });
+      es.addEventListener("session", (e) => {
+        try {
+          const d = JSON.parse(e.data);
+          applySessionData(d);
+        } catch (err) {
+          console.error("SSE parse", err);
+        }
+      });
+      // done — no polling any more
+    </script>
+  </body>
+</html>

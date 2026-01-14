@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Leerling</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Improved learner page styling */
+      .question-card {
+        background: linear-gradient(135deg, #5b3e99 0%, #7c4db6 100%);
+        color: #fff;
+        padding: 30px 20px;
+        border-radius: 18px;
+        text-align: center;
+        box-shadow: 0 12px 34px rgba(103, 80, 164, 0.18);
+      }
+      .score-display {
+        background: linear-gradient(180deg, #fff, #fbfbff);
+        padding: 16px;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 18px;
+        border: 1px solid rgba(103, 80, 164, 0.06);
+      }
+      .score-display h3 {
+        margin: 0 0 6px 0;
+      }
+      .score-display #score-display {
+        font-size: 20px;
+        font-weight: 800;
+        color: #2b225c;
+      }
+
+      .answer-form {
+        background: #fff;
+        padding: 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(103, 80, 164, 0.08);
+        margin-top: 18px;
+        box-shadow: 0 6px 18px rgba(103, 80, 164, 0.04);
+      }
+      .answer-form input {
+        font-size: 18px;
+        padding: 14px;
+        text-align: center;
+        border: 1px solid #e9e6f7;
+        border-radius: 10px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .answer-form input:focus {
+        border-color: #6750a4;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(103, 80, 164, 0.08);
+      }
+      .answer-form button {
+        font-size: 18px;
+        padding: 14px 20px;
+        width: 100%;
+        margin-top: 12px;
+        color: white;
+        background: linear-gradient(135deg, #6b4bd1 0%, #7c5ee0 100%);
+        font-weight: 800;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 8px 26px rgba(103, 80, 164, 0.12);
+      }
+      .answer-form button:hover {
+        transform: translateY(-2px);
+      }
+
+      .status-message {
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin: 12px 0;
+        text-align: center;
+        font-weight: 700;
+      }
+      .status-success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .status-error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .status-info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+
+      .waiting-screen {
+        text-align: center;
+        padding: 48px 20px;
+        color: #666;
+      }
+      .spinner {
+        border: 4px solid #f3f3f4;
+        border-top: 4px solid #6750a4;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        animation: spin 1s linear infinite;
+        margin: 16px auto;
+      }
+
+      .completed-screen {
+        text-align: center;
+        padding: 28px 16px;
+        background: #f6e6ff;
+        border-radius: 12px;
+        border: 1px solid rgba(103, 80, 164, 0.08);
+      }
+
+      .recent-answers {
+        max-height: 260px;
+        overflow-y: auto;
+        margin-top: 12px;
+      }
+      .answer-item {
+        padding: 12px;
+        margin: 8px 0;
+        background: linear-gradient(180deg, #fff, #fbfbff);
+        border-radius: 10px;
+        border-left: 4px solid #eee;
+        box-shadow: 0 6px 18px rgba(43, 34, 92, 0.04);
+      }
+
+      /* Logout button */
+      #logout-btn {
+        position: absolute;
+        right: 18px;
+        top: 18px;
+      }
+      .logout-btn {
+        color: #d9534f;
+        font-weight: 700;
+        padding: 8px 12px;
+        border-radius: 8px;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 520px) {
+        .question-card {
+          padding: 18px;
+        }
+        .answer-form button {
+          padding: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card" id="join-card">
+        <h2>Leerling: doe mee</h2>
+        <div
+          id="error-message"
+          class="status-message status-error"
+          style="display: none"
+        ></div>
+        <form id="join-form">
+          <label>Klascode</label><input name="join_klascode" required />
+          <label>Naam</label><input name="naam" required />
+          <div style="margin-top: 12px">
+            <button class="btn-primary" type="submit">Deelnemen</button>
+          </div>
+        </form>
+      </div>
+      <div class="card" id="main-card" style="display: none">
+        <a href="#" id="logout-btn" class="logout-btn">Uitloggen</a>
+        <div class="score-display">
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 12px;
+            "
+          >
+            <div>
+              <h3>Jouw Score</h3>
+              <div id="score-display">Laden...</div>
+              <p id="answer-count">Laden...</p>
+            </div>
+            <div style="text-align: right">
+              <div
+                id="connection-indicator"
+                class="connection-indicator disconnected"
+              >
+                <span class="dot"></span>Offline
+              </div>
+              <div
+                style="
+                  font-size: 12px;
+                  color: var(--on-surface-variant);
+                  margin-top: 6px;
+                "
+              >
+                Live verbinding
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="question-section" style="display: none">
+          <h3>Beantwoord de vraag:</h3>
+          <p id="question-text">...</p>
+          <input
+            type="text"
+            id="answer-input"
+            placeholder="Typ hier je antwoord..."
+          />
+          <button id="submit-btn" class="btn-primary">Verstuur Antwoord</button>
+        </div>
+        <div id="waiting-section" style="display: none">
+          <h3>Wachten op de volgende vraag</h3>
+          <div class="spinner"></div>
+        </div>
+        <div id="completed-section" style="display: none">
+          <h3>Vraag beantwoord!</h3>
+          <p id="completed-question">...</p>
+          <p id="completed-subtitle">
+            Je hebt deze vraag beantwoord. Wacht op beoordeling...
+          </p>
+        </div>
+        <div>
+          <h3>Jouw recente antwoorden</h3>
+          <div id="recent-answers">Laden...</div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Student flow using the Node.js API
+      const JOIN_FORM = document.getElementById("join-form");
+      const JOIN_CARD = document.getElementById("join-card");
+      const MAIN_CARD = document.getElementById("main-card");
+      const LOGOUT_BTN = document.getElementById("logout-btn");
+
+      function showJoin() {
+        JOIN_CARD.style.display = "";
+        MAIN_CARD.style.display = "none";
+      }
+      function showMain() {
+        JOIN_CARD.style.display = "none";
+        MAIN_CARD.style.display = "";
+      }
+
+      // Replace legacy beacons/status endpoints with Node route
+      function updateStatus(status) {
+        const leerling_id = localStorage.getItem("leerling_id");
+        const klas_id = localStorage.getItem("klas_id");
+        if (!leerling_id || !klas_id) return;
+        // best-effort send
+        try {
+          navigator.sendBeacon(
+            "/status-update",
+            new URLSearchParams({ status, leerling_id, klas_id })
+          );
+        } catch (e) {}
+      }
+
+      // Hook presence events + heartbeat + title updates
+      const _origTitle = document.title || "Leerling";
+      let _presenceHeartbeat = null;
+
+      function setTitleActive(isActive) {
+        if (isActive) document.title = "(Actief) " + _origTitle;
+        else document.title = "(Afwezig) " + _origTitle;
+      }
+
+      function sendStatus(status, useBeacon = false) {
+        try {
+          const leerling_id = localStorage.getItem("leerling_id");
+          const klas_id = localStorage.getItem("klas_id");
+          if (!leerling_id) return;
+          if (useBeacon && navigator.sendBeacon) {
+            try {
+              navigator.sendBeacon(
+                "/status-update",
+                new URLSearchParams({ status, leerling_id, klas_id })
+              );
+              return;
+            } catch (e) {
+              // fallback
+            }
+          }
+          // JSON POST for regular pings
+          fetch("/status-update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              leerling_id: Number(leerling_id),
+              klas_id: Number(klas_id),
+              status,
+            }),
+          }).catch(() => {});
+        } catch (e) {}
+      }
+
+      function startPresenceHeartbeat() {
+        if (_presenceHeartbeat) return;
+        sendStatus("actief");
+        _presenceHeartbeat = setInterval(() => sendStatus("actief"), 20000);
+      }
+      function stopPresenceHeartbeat() {
+        if (!_presenceHeartbeat) return;
+        clearInterval(_presenceHeartbeat);
+        _presenceHeartbeat = null;
+      }
+
+      window.addEventListener("pagehide", function () {
+        sendStatus("closed", true);
+        stopPresenceHeartbeat();
+        setTitleActive(false);
+      });
+      document.addEventListener("visibilitychange", () => {
+        const isVisible = document.visibilityState === "visible";
+        sendStatus(isVisible ? "actief" : "non-actief");
+        setTitleActive(isVisible);
+        if (isVisible) startPresenceHeartbeat();
+        else stopPresenceHeartbeat();
+      });
+      window.addEventListener("blur", () => {
+        sendStatus("non-actief");
+        setTitleActive(false);
+        stopPresenceHeartbeat();
+      });
+      window.addEventListener("focus", () => {
+        sendStatus("actief");
+        setTitleActive(true);
+        startPresenceHeartbeat();
+      });
+
+      // Join flow
+      JOIN_FORM.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const code = (form.join_klascode.value || "").toUpperCase().trim();
+        const naam = (form.naam.value || "").trim();
+        const em = document.getElementById("error-message");
+        em.style.display = "none";
+        if (!code || !naam) {
+          em.textContent = "Klascode en naam verplicht";
+          em.style.display = "";
+          return;
+        }
+        try {
+          const res = await fetch("/leerling/join", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ klascode: code, naam }),
+          });
+          if (!res.ok) {
+            const j = await res.json().catch(() => ({}));
+            em.textContent = j.error || "Kon niet deelnemen";
+            em.style.display = "";
+            return;
+          }
+          const j = await res.json();
+          localStorage.setItem("leerling_id", String(j.leerling_id));
+          localStorage.setItem("klas_id", String(j.klas_id));
+          showMain();
+          updateAppState();
+          // start presence (heartbeat + immediate status)
+          sendStatus("actief");
+          startPresenceHeartbeat();
+        } catch (err) {
+          em.textContent = "Netwerkfout";
+          em.style.display = "";
+        }
+      });
+
+      LOGOUT_BTN.addEventListener("click", (e) => {
+        e.preventDefault();
+        localStorage.removeItem("leerling_id");
+        localStorage.removeItem("klas_id");
+        location.reload();
+      });
+
+      // Submit answer -> POST /sessies/:id/answer
+      async function submitAnswer() {
+        if (appState.isSubmitting) return;
+
+        const input = document.getElementById("answer-input");
+        const button = document.getElementById("submit-btn");
+        const answer = input.value.trim();
+
+        if (!answer) {
+          showMessage("Vul je antwoord in!", "error");
+          input.focus();
+          return;
+        }
+        if (!appState.currentSessionId || !appState.currentQuestionId) {
+          showMessage("Geen actieve vraag.", "error");
+          return;
+        }
+
+        appState.isSubmitting = true;
+        input.disabled = true;
+        button.disabled = true;
+        button.textContent = "Versturen...";
+
+        showMessage("Antwoord wordt verstuurd...", "info");
+
+        try {
+          const leerling_id = Number(localStorage.getItem("leerling_id"));
+          const res = await fetch(
+            `/sessies/${appState.currentSessionId}/answer`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                leerling_id,
+                vraag_id: appState.currentQuestionId,
+                antwoord: answer,
+              }),
+            }
+          );
+          const j = await res.json();
+          if (j.success) {
+            showMessage("Antwoord verstuurd!", "success");
+            showCompletedState(
+              document.getElementById("question-text").textContent
+            );
+            updateAppState();
+          } else {
+            showMessage(j.message || "Fout bij versturen", "error");
+            appState.isSubmitting = false;
+            input.disabled = false;
+            button.disabled = false;
+            button.textContent = "Verstuur Antwoord";
+          }
+        } catch (err) {
+          console.error("Submit error:", err);
+          showMessage("Netwerkfout. Probeer opnieuw.", "error");
+          appState.isSubmitting = false;
+          input.disabled = false;
+          button.disabled = false;
+          button.textContent = "Verstuur Antwoord";
+        }
+      }
+
+      // State management
+      const appState = {
+        currentSessionId: null,
+        currentQuestionId: null,
+        isSubmitting: false,
+        lastAnswerIds: new Set(),
+        connectionState: "disconnected",
+      };
+
+      // Show messages
+      function showMessage(text, type) {
+        console.log(`[${type}] ${text}`);
+        // You can show a toast/notification here if desired
+      }
+
+      // Update score display
+      function updateScore(score, answerCount) {
+        const scoreDisplay = document.getElementById("score-display");
+        const answerCountDisplay = document.getElementById("answer-count");
+        if (scoreDisplay) scoreDisplay.textContent = `${score} punten`;
+        if (answerCountDisplay)
+          answerCountDisplay.textContent = `${answerCount} beantwoord`;
+      }
+
+      function escapeHtml(s) {
+        if (!s) return "";
+        return String(s).replace(
+          /[&<>\"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[c])
+        );
+      }
+
+      // Update recent answers (colored badges + new-answer highlight)
+      function updateRecentAnswers(answers) {
+        const container = document.getElementById("recent-answers");
+        if (!container) return;
+        if (!answers || answers.length === 0) {
+          container.innerHTML = "<p>Nog geen antwoorden</p>";
+          appState.lastAnswerIds.clear();
+          return;
+        }
+
+        const prevIds = new Set(appState.lastAnswerIds);
+        const ids = [];
+
+        container.innerHTML = answers
+          .map((a) => {
+            const id =
+              a.id || a.resultaat_id || (a.rid ? a.rid : Math.random());
+            ids.push(id);
+            const question = escapeHtml(a.question || a.vraag || "Vraag");
+            const answer = escapeHtml(
+              a.answer || a.antwoord || a.gegeven_antwoord || "—"
+            );
+            const status = (a.status || "onbekend").toLowerCase();
+            const badgeClass =
+              status === "goed"
+                ? "goed"
+                : status === "typfout"
+                ? "typfout"
+                : status === "fout"
+                ? "fout"
+                : "onbekend";
+            const isNew = !prevIds.has(id);
+            const newClass = isNew ? " new" : "";
+            return `
+              <div class="answer-item${newClass}" data-id="${id}">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+                  <div style="flex:1;min-width:0">
+                    <strong style="display:block">${question}</strong>
+                    <div style="color:#444;margin-top:6px;white-space:normal;overflow-wrap:break-word">${answer}</div>
+                    <div style="font-size:12px;color:var(--on-surface-variant);margin-top:6px">${escapeHtml(
+                      a.created_at || ""
+                    )}</div>
+                  </div>
+                  <div style="flex:0;margin-left:12px;white-space:nowrap">
+                    <span class="status-badge ${badgeClass}">${status}</span>
+                  </div>
+                </div>
+              </div>`;
+          })
+          .join("");
+
+        // update tracked IDs
+        appState.lastAnswerIds = new Set(ids);
+
+        // remove 'new' highlight after a short time
+        setTimeout(() => {
+          const newEls = container.querySelectorAll(".answer-item.new");
+          newEls.forEach((el) => el.classList.remove("new"));
+        }, 2200);
+      }
+
+      // Show waiting state
+      function showWaitingState() {
+        const questionSection = document.getElementById("question-section");
+        const waitingSection = document.getElementById("waiting-section");
+        const completedSection = document.getElementById("completed-section");
+        if (questionSection) questionSection.style.display = "none";
+        if (waitingSection) waitingSection.style.display = "";
+        if (completedSection) completedSection.style.display = "none";
+      }
+
+      // Show question state
+      function showQuestionState(questionText) {
+        const questionSection = document.getElementById("question-section");
+        const waitingSection = document.getElementById("waiting-section");
+        const completedSection = document.getElementById("completed-section");
+        const questionTextDisplay = document.getElementById("question-text");
+        const answerInput = document.getElementById("answer-input");
+        const submitBtn = document.getElementById("submit-btn");
+
+        if (questionTextDisplay) questionTextDisplay.textContent = questionText;
+        if (answerInput) {
+          answerInput.value = "";
+          answerInput.disabled = false;
+        }
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Verstuur Antwoord";
+        }
+        if (questionSection) questionSection.style.display = "";
+        if (waitingSection) waitingSection.style.display = "none";
+        if (completedSection) completedSection.style.display = "none";
+      }
+
+      // Show completed state
+      function showCompletedState(questionText) {
+        const questionSection = document.getElementById("question-section");
+        const waitingSection = document.getElementById("waiting-section");
+        const completedSection = document.getElementById("completed-section");
+        const completedQuestionDisplay =
+          document.getElementById("completed-question");
+
+        if (completedQuestionDisplay)
+          completedQuestionDisplay.textContent = questionText;
+        if (questionSection) questionSection.style.display = "none";
+        if (waitingSection) waitingSection.style.display = "none";
+        if (completedSection) completedSection.style.display = "";
+      }
+
+      // Update state from server
+      async function updateAppState() {
+        const leerlingId = localStorage.getItem("leerling_id");
+        const klasId = localStorage.getItem("klas_id");
+        if (!leerlingId || !klasId) return;
+
+        try {
+          const res = await fetch(
+            `/student/state?leerling_id=${encodeURIComponent(
+              leerlingId
+            )}&klas_id=${encodeURIComponent(klasId)}`
+          );
+          if (!res.ok) throw new Error("state failed");
+          const data = await res.json();
+
+          if (data.session_ended) {
+            // clear local storage and show join
+            showMessage(
+              "Er is geen actieve sessie meer. Je bent uitgelogd.",
+              "info"
+            );
+            localStorage.removeItem("leerling_id");
+            localStorage.removeItem("klas_id");
+            setTimeout(() => {
+              location.reload();
+            }, 1400);
+            return;
+          }
+          if (data.error) {
+            console.error("State error:", data.error);
+            return;
+          }
+
+          updateScore(data.score || 0, data.answer_count || 0);
+          updateRecentAnswers(data.recent_answers || []);
+
+          const newQuestionId = data.current_question_id;
+          const hasQuestionChanged =
+            newQuestionId !== appState.currentQuestionId;
+          if (hasQuestionChanged) {
+            appState.currentQuestionId = newQuestionId;
+            appState.currentSessionId = data.session_id;
+            appState.isSubmitting = false;
+            // Start SSE stream on first session
+            if (data.session_id && !sseStream) {
+              startSSEStream(data.session_id);
+            }
+          }
+
+          if (!newQuestionId) showWaitingState();
+          else if (data.already_answered)
+            showCompletedState(data.question_text);
+          else showQuestionState(data.question_text);
+
+          if (newQuestionId && data.already_answered) {
+            const subtitle = document.getElementById("completed-subtitle");
+            const reveal = document.getElementById("reveal-answer");
+            const revealText = document.getElementById("reveal-answer-text");
+            if (data.all_answered && data.correct_answer) {
+              if (revealText) revealText.textContent = data.correct_answer;
+              if (reveal) reveal.style.display = "block";
+              if (subtitle)
+                subtitle.textContent =
+                  "Alle antwoorden binnen! Dit is het juiste antwoord:";
+            } else {
+              if (reveal) reveal.style.display = "none";
+              if (subtitle)
+                subtitle.textContent =
+                  "Je hebt deze vraag beantwoord. Wacht op beoordeling...";
+            }
+          }
+        } catch (err) {
+          console.error("Update error:", err);
+        }
+      }
+
+      // SSE stream control
+      let sseStream = null;
+
+      function setConnectionState(state) {
+        appState.connectionState = state;
+        const el = document.getElementById("connection-indicator");
+        if (!el) return;
+        el.classList.remove("connected", "polling", "disconnected");
+        if (state === "connected") {
+          el.classList.add("connected");
+          el.innerHTML = '<span class="dot"></span>Live';
+        } else if (state === "polling") {
+          el.classList.add("polling");
+          el.innerHTML = '<span class="dot"></span>Polling';
+        } else {
+          el.classList.add("disconnected");
+          el.innerHTML = '<span class="dot"></span>Offline';
+        }
+      }
+      // initialize UI state
+      setConnectionState(appState.connectionState);
+
+      function startSSEStream(sessionId) {
+        if (sseStream) return;
+        const token = localStorage.getItem("token");
+        const url = token
+          ? `/sessies/${sessionId}/stream?token=${encodeURIComponent(token)}`
+          : `/sessies/${sessionId}/stream`;
+        sseStream = new EventSource(url);
+
+        sseStream.addEventListener("open", () => {
+          console.log("SSE connected");
+          setConnectionState("connected");
+        });
+
+        // Listen for both teacher 'session' events and lightweight 'update' events
+        sseStream.addEventListener("session", (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            // teacher clients receive full payload; student clients can refetch
+            updateAppState();
+          } catch (err) {
+            console.error("SSE session parse error:", err);
+          }
+        });
+
+        sseStream.addEventListener("update", (e) => {
+          try {
+            // update event triggers a fetch for current state
+            updateAppState();
+          } catch (err) {
+            console.error("SSE update parse error:", err);
+          }
+        });
+
+        sseStream.addEventListener("error", (e) => {
+          console.error("SSE error:", e);
+          setConnectionState("disconnected");
+          // try to reconnect after a short delay if closed
+          if (sseStream.readyState === EventSource.CLOSED) {
+            console.log("SSE stream closed, attempting reconnect in 3s");
+            sseStream = null;
+            setTimeout(() => startSSEStream(sessionId), 3000);
+          }
+        });
+      }
+
+      function stopSSEStream() {
+        if (sseStream) {
+          sseStream.close();
+          sseStream = null;
+        }
+        setConnectionState("disconnected");
+      }
+
+      // Initialize on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        const leerlingId = localStorage.getItem("leerling_id");
+        const klasId = localStorage.getItem("klas_id");
+        if (leerlingId && klasId) {
+          showMain();
+          updateStatus("actief");
+          updateAppState();
+          // SSE stream will be started after getting session ID from first update
+        } else {
+          showJoin();
+        }
+
+        // Handle Enter key in input
+        document
+          .getElementById("answer-input")
+          .addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              submitAnswer();
+            }
+          });
+        // Submit button click
+        document.getElementById("submit-btn").addEventListener("click", (e) => {
+          e.preventDefault();
+          submitAnswer();
+        });
+      });
+
+      // Expose submit for inline onclick
+      window.submitAnswer = submitAnswer;
+    </script>
+  </body>
+</html>

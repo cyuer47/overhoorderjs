@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="description"
+      content="Overhoren en oefenen met de overhoorder voor VO. Ontwikkeld door Iven Boxem (IvenBoxem VO / IB VO)."
+    />
+    <meta
+      name="keywords"
+      content="overhoren, overhoorder, vo, VO, overhoren VO, overhoorder VO, ivenboxem VO, Iven Boxem VO, IvenBoxem VO, IB VO"
+    />
+    <title>Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <script>
+      !(function (t, e) {
+        var o, n, p, r;
+        e.__SV ||
+          (window.posthog && window.posthog.__loaded) ||
+          ((window.posthog = e),
+          (e._i = []),
+          (e.init = function (i, s, a) {
+            function g(t, e) {
+              var o = e.split(".");
+              2 == o.length && ((t = t[o[0]]), (e = o[1])),
+                (t[e] = function () {
+                  t.push([e].concat(Array.prototype.slice.call(arguments, 0)));
+                });
+            }
+            ((p = t.createElement("script")).type = "text/javascript"),
+              (p.crossOrigin = "anonymous"),
+              (p.async = !0),
+              (p.src =
+                s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") +
+                "/static/array.js"),
+              (r = t.getElementsByTagName("script")[0]).parentNode.insertBefore(
+                p,
+                r
+              );
+            var u = e;
+            for (
+              void 0 !== a ? (u = e[a] = []) : (a = "posthog"),
+                u.people = u.people || [],
+                u.toString = function (t) {
+                  var e = "posthog";
+                  return (
+                    "posthog" !== a && (e += "." + a), t || (e += " (stub)"), e
+                  );
+                },
+                u.people.toString = function () {
+                  return u.toString(1) + ".people (stub)";
+                },
+                o =
+                  "init Ce js Ls Te Fs Ds capture Ye calculateEventProperties zs register register_once register_for_session unregister unregister_for_session Ws getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty Bs Us createPersonProfile Hs Ms Gs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Ns debug L qs getPageViewId captureTraceFeedback captureTraceMetric".split(
+                    " "
+                  ),
+                n = 0;
+              n < o.length;
+              n++
+            )
+              g(u, o[n]);
+            e._i.push([i, s, a]);
+          }),
+          (e.__SV = 1));
+      })(document, window.posthog || []);
+      posthog.init("phc_bjbHSOWX3nTZKHLlw7SSkutWkjSfTV38ewAcRmxPsYN", {
+        api_host: "https://eu.i.posthog.com",
+        defaults: "2025-05-24",
+        person_profiles: "always", // or 'always' to create profiles for anonymous users as well
+      });
+    </script>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="https://overhoren.ivenboxem.nl/assets/img/logo2.png"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      /* Landing specific layout while using the shared Material 3 theme */
+      .hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .landing-card {
+        max-width: 1000px;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 28px;
+        align-items: center;
+      }
+      .illustration {
+        background: var(--primary-container);
+        color: var(--on-primary-container);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-1);
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .illustration img {
+        max-width: 100%;
+        height: auto;
+        filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.12));
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .features {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .feature {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 14px;
+        padding: 10px 12px;
+        box-shadow: var(--shadow-1);
+      }
+      .feature svg {
+        flex: 0 0 24px;
+      }
+      .hidden {
+        display: none;
+      }
+      @media (max-width: 860px) {
+        .landing-card {
+          grid-template-columns: 1fr;
+        }
+      }
+      footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+      }
+
+      p.privacy-policy {
+        text-decoration: underline;
+      }
+    </style>
+    <!-- Plyr CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css"
+    />
+
+    <!-- Plyr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.min.js"></script>
+  </head>
+  <body>
+    <div class="container hero">
+      <div class="card landing-card">
+        <div>
+          <div class="chip">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="20"
+              viewBox="0 -960 960 960"
+              width="20"
+              fill="#21005E"
+            >
+              <path
+                d="M440-278v-394q-41-24-87-36t-93-12q-36 0-71.5 7T120-692v396q35-12 69.5-18t70.5-6q47 0 91.5 10.5T440-278ZM40-234v-482q0-11 5.5-21T62-752q46-24 96-36t102-12q74 0 126 17t112 52q11 6 16.5 14t5.5 21v418q44-21 88.5-31.5T700-320q36 0 70.5 6t69.5 18v-441q0-17 11.5-28.5T880-777q17 0 28.5 11.5T920-737v503q0 23-19.5 35t-40.5 1q-37-20-77.5-31T700-240q-49 0-95.5 14.5T516-185q-8 5-17.5 7.5T480-175q-9 0-18.5-2.5T444-185q-42-26-88.5-40.5T260-240q-42 0-82.5 11T100-198q-21 11-40.5-1T40-234Zm580-208v-369q0-13 7.5-23.5T647-849l54-18q14-5 26.5 4.5T740-838v369q0 13-7.5 23.5T713-431l-54 18q-14 5-26.5-4.5T620-442Zm-340-57Z"
+              />
+            </svg>
+            Overhoorder
+          </div>
+
+          <h1 class="app-title">Klaar om te overhoren?</h1>
+
+          <div class="features">
+            <div class="feature">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24"
+                viewBox="0 -960 960 960"
+                width="24"
+                fill="#6750A4"
+              >
+                <path
+                  d="M172-86q-35 8-59.5-17T95-172l41-199 235 235-199 41Zm199-41L136-371l457-457q37-37 89-37t89 37l57 57q37 37 37 89t-37 89L371-136Z"
+                />
+              </svg>
+              <span class="helper">Interactieve vragen</span>
+            </div>
+            <div class="feature">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24"
+                viewBox="0 -960 960 960"
+                width="24"
+                fill="#A96424"
+              >
+                <path
+                  d="M212-86q-52 0-89-37t-37-89v-536q0-52 37-89t89-37h536q52 0 89 37t37 89v536q0 52-37 89t-89 37H212Zm0-126h536v-536H212v536Zm80-80h265v-80H292v80Zm0-148h376v-80H292v80Zm0-148h376v-80H292v80Z"
+                />
+              </svg>
+              <span class="helper">Realtime scorebord</span>
+            </div>
+            <div class="feature">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+                fill="#0B6B53"
+              >
+                <path
+                  d="M360-86q-114.17 0-194.08-79.92Q86-245.83 86-360v-240q0-114.17 79.92-194.08Q245.83-874 360-874h240q114.17 0 194.08 79.92Q874-714.17 874-600v240q0 114.17-79.92 194.08Q714.17-86 600-86H360Zm77-223 251-251-67-67-184 184-88-88-67 67 155 155Z"
+                ></path>
+              </svg>
+              <span class="helper">Eenvoudig deelnemen</span>
+            </div>
+            <div class="feature hidden">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+                fill="#8C1A10"
+              >
+                <path
+                  d="M480-708 336-851l88-90 56 57 111-111 89 88-200 199ZM160 31q-30 0-52-21.5T86-42v-326.29L172-613q10-29 34.18-46T260-676h440q29.64 0 53.82 17T788-613l86 244.71V-42q0 30-22 51.5T800 31h-9q-30 0-52-20.12Q717-9.25 717-39v-10H243v10q0 29.75-22 49.88Q199 31 169 31h-9Zm86-473h468l-37-108H283l-37 108Zm60 234q25 0 42.5-17.5T366-268q0-25-17.5-42.5T306-328q-25 0-42.5 17.5T246-268q0 25 17.5 42.5T306-208Zm348 0q25 0 42.5-17.5T714-268q0-25-17.5-42.5T654-328q-25 0-42.5 17.5T594-268q0 25 17.5 42.5T654-208Z"
+                />
+              </svg>
+              <span class="helper">Crash veilig</span>
+            </div>
+            <div class="feature hidden">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+                fill="#666666"
+              >
+                <path
+                  d="M77-77q0-108 26-186.5T171-396q42-54 96-85.5T377-526v-89q-138-23-216-94T77-883h806q-6 103-84 174.5T583-615v89q56 13 110 44.5t96 85.5q42 54 68 132.5T883-77H661v-126h82q-23-113-97.5-162T479-414q-92 0-165 49t-97 162h82v126H77Zm388 0q-35 0-60.5-25.5T379-163q0-18 6.5-33.5T405-224q23-23 86.5-49.5T633-331q-30 78-57.5 142T525-102q-12 13-27 19t-33 6Z"
+                />
+              </svg>
+              <span class="helper">Huiswerk overwegen</span>
+            </div>
+            <div class="feature hidden">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+                fill="#FBE6A3"
+              >
+                <path
+                  d="M208-272q-88 0-148-60T0-480q0-86 61.5-147T208-688q73 0 129.5 46T410-528h9l-67-184h-72v-96h215v96h-41l10 24h160l-54-144h-98v-96h104q28 0 51.5 15.5T660-871l65 181h27q87 0 147.5 60.5T960-482q0 87-60.5 147.5T752-274q-72 0-128.5-44T550-432H410q-16 69-71.5 114.5T208-272Zm-8-160h108v-96H200v96ZM525-31 263-162h174v-87l261 131H525v87Zm-12-497h37q5-18 11.5-34t15.5-30h-81l17 64Zm195 71 90-32-37-102-90 33 37 101Z"
+                />
+              </svg>
+              <span class="helper">Snelle vooruitgang</span>
+            </div>
+          </div>
+
+          <p class="helper" style="font-size: 15px">
+            Kies je rol en start direct. Een moderne Material 3 ervaring voor
+            docenten en leerlingen.
+          </p>
+
+          <p class="helper" style="font-size: 14px">
+            Snap je er niets van? <a href="./../faq/" title="FAQ">Meer weten</a>
+          </p>
+
+          <div class="actions">
+            <a class="btn-primary" href="login.html">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="20"
+                viewBox="0 -960 960 960"
+                width="20"
+                fill="currentColor"
+                style="vertical-align: middle; margin-right: 6px"
+              >
+                <path
+                  d="M212-86q-53 0-89.5-36.5T86-212v-536q0-53 36.5-89.5T212-874h276v126H212v536h276v126H212Zm415-146-88-89 96-96H352v-126h283l-96-96 88-89 247 248-247 248Z"
+                />
+              </svg>
+              Ik ben docent
+            </a>
+            <a class="btn-secondary" href="leerling.html">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="20"
+                viewBox="0 -960 960 960"
+                width="20"
+                fill="currentColor"
+                style="vertical-align: middle; margin-right: 6px"
+              >
+                <path
+                  d="M480-512q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM172-172v-118q0-33 17-60t45-42q66-32 128-48t118-16q56 0 118 16t128 48q28 15 45 42t17 60v118H172Z"
+                />
+              </svg>
+              Ik ben leerling
+            </a>
+          </div>
+        </div>
+
+        <!-- Trailer Video -->
+        <div class="trailer">
+          <video id="trailer-player" controls>
+            <source src="assets/video/trailer.mp4" type="video/mp4" />
+            Je browser ondersteunt de video tag niet.
+          </video>
+        </div>
+        <!-- Plyr Initialisatie -->
+        <script>
+          const trailerPlayer = new Plyr("#trailer-player", {
+            controls: [
+              "play",
+              "progress",
+              "current-time",
+              "mute",
+              "volume",
+              "fullscreen",
+            ],
+            autoplay: false,
+            loop: { active: false },
+            volume: 0.8,
+          });
+        </script>
+        <!-- Trailer Styling -->
+        <style>
+          .trailer {
+            max-width: 800px;
+            margin: 40px auto;
+          }
+          .trailer video {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+          }
+          .plyr--video {
+            border-radius: 14px !important;
+          }
+        </style>
+      </div>
+    </div>
+    <footer>
+      <p class="privacy-policy">
+        <a href="../privacy-policy">Privacy Policy</a>
+      </p>
+    </footer>
+  </body>
+</html>

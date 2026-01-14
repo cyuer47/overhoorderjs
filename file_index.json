@@ -1,0 +1,194 @@
+[
+  {
+    "path": ".env",
+    "size": 78,
+    "mtimeMs": 1767895537418.8352,
+    "sha256": "2d16308e082eb0b96787be8b28aaa1cee29f002f2a5e1d51b022d19cc2ffface"
+  },
+  {
+    "path": ".gitignore",
+    "size": 4,
+    "mtimeMs": 1767875174105.4812,
+    "sha256": "e9cbb0224c4a3d23a6019ba557e0cd568c1ad5e1582ff1e335fb7d99b7a1055d"
+  },
+  {
+    "path": "assets/css/styles.css",
+    "size": 8342,
+    "mtimeMs": 1767898130598.0454,
+    "sha256": "60d7f41889772ab8d6bb9a1da6b2a9d42e7547736b028baca4afc765f089d8e8"
+  },
+  {
+    "path": "dashboard.html",
+    "size": 14112,
+    "mtimeMs": 1767962255109.8328,
+    "sha256": "76f4074d1393877a9cbed041ae51721bae805305ebd545157bc363cf74bfc891"
+  },
+  {
+    "path": "data.db",
+    "size": 40960,
+    "mtimeMs": 1767897180625.5713,
+    "sha256": "a1fe3f3b0156d6a79977e62914b09b59fa0fab29b3c28a37f5cddab78a04ee31"
+  },
+  {
+    "path": "data.db-shm",
+    "size": 32768,
+    "mtimeMs": 1768316516573.5864,
+    "sha256": "0baa44710939bbb08459650f109aed4ef291b3007273bb7628e96891e663c912"
+  },
+  {
+    "path": "data.db-wal",
+    "size": 585072,
+    "mtimeMs": 1768316529205.2866,
+    "sha256": "87c18a6387db03b29144945f916b393b93e637c2fb9262badffaaed5ccaa4e3d"
+  },
+  {
+    "path": "docs/index.html",
+    "size": 1634,
+    "mtimeMs": 1767985260399.6638,
+    "sha256": "b1b139c5584c94338ad495341e54518bf6cd5f9799dcc4a5ef058aa6c1e9bb62"
+  },
+  {
+    "path": "docs/swagger.json",
+    "size": 18612,
+    "mtimeMs": 1768316247919.5793,
+    "sha256": "1a437847ba1b56851bfbf692474bbee9a7a77978f5f2ebb0f6c44ca489e7b4ff"
+  },
+  {
+    "path": "ebook_viewer.html",
+    "size": 1767,
+    "mtimeMs": 1767898491420.4917,
+    "sha256": "b1318a3ffd709da0b0fa539f42818e0fa159de49cd147e2ff84a0343847b5c34"
+  },
+  {
+    "path": "export_results.html",
+    "size": 1984,
+    "mtimeMs": 1767963631360.8958,
+    "sha256": "0af641eff9ce24dda1959d766222940b2c667019a3ef1a7af44738f59fc5d490"
+  },
+  {
+    "path": "import/mysql_dump.sql",
+    "size": 11247,
+    "mtimeMs": 1767895876963.5486,
+    "sha256": "95fd4f1295474d29573c95f6e1b6032e9f543bd93efb3e43c60bb1e6f45ff7e6"
+  },
+  {
+    "path": "index.html",
+    "size": 14606,
+    "mtimeMs": 1768315844710.648,
+    "sha256": "5a3585cdd8cac79305d7c5f0bbbe46d95f3489f6abed56cd4f26010581bac997"
+  },
+  {
+    "path": "leerling.html",
+    "size": 23127,
+    "mtimeMs": 1768316477692.895,
+    "sha256": "f2237393ceceb4a1656747cbc74008528a519ac073d3c03022a81fea74c55cdd"
+  },
+  {
+    "path": "login.html",
+    "size": 2170,
+    "mtimeMs": 1767898048928.364,
+    "sha256": "1d8d0be917259e401e857cfaad6a10be13af4cf589d1467adc8c62f5c1f97798"
+  },
+  {
+    "path": "manage_klas.html",
+    "size": 10676,
+    "mtimeMs": 1767899747562.6865,
+    "sha256": "e64a1d7e20fb6dd800258a5db5663e5d18adb092549f5466b021f047b3bdd047"
+  },
+  {
+    "path": "manage_vragenlijst.html",
+    "size": 12490,
+    "mtimeMs": 1767961885069.7603,
+    "sha256": "1e067c8349a2bdbd9ce8155aca1d921f3d4ff82e1d0bf13c048d6f1c6b4f821f"
+  },
+  {
+    "path": "package-lock.json",
+    "size": 87668,
+    "mtimeMs": 1767879185055.1938,
+    "sha256": "dd4fa68deb199d90effe418b8567e145798b8538c37602e78b47b013828dcc57"
+  },
+  {
+    "path": "package.json",
+    "size": 254,
+    "mtimeMs": 1767879185025.166,
+    "sha256": "0fa3dfa654055caeff1d1fad71422e0126efad456529ed487f3d653962827f2c"
+  },
+  {
+    "path": "register.html",
+    "size": 2647,
+    "mtimeMs": 1767898059042.764,
+    "sha256": "ca33d8d3fdcee944b9fb9e6933b878a475d2f562d96cc2136ee9ebbfbc6fb4b8"
+  },
+  {
+    "path": "scripts/check-db.js",
+    "size": 485,
+    "mtimeMs": 1767896506549.471,
+    "sha256": "3eefa0c2ef52b28edd0cde70da5881e3030029046597dc6f3c0b5487a3f26e2e"
+  },
+  {
+    "path": "scripts/convert-mysql-to-sqlite.js",
+    "size": 9902,
+    "mtimeMs": 1767897043594.8208,
+    "sha256": "5c3c467ed62460c58ceb1a6f176f436c5a64f7b73a1689c53d81911a11b7ff91"
+  },
+  {
+    "path": "scripts/import-docenten.js",
+    "size": 1949,
+    "mtimeMs": 1767897181233.4446,
+    "sha256": "e461b1260a677f24e220946772c7b36bdd1c828e832b351858a6d34b0aeee68b"
+  },
+  {
+    "path": "scripts/index-files.js",
+    "size": 1454,
+    "mtimeMs": 1768317266927.177,
+    "sha256": "ae36c92b9cdd8ef7d43698abbefb7db139b19dba8dbf82ec7580180e526b13e9"
+  },
+  {
+    "path": "scripts/list-all-tables.js",
+    "size": 385,
+    "mtimeMs": 1767899338255.928,
+    "sha256": "03ca83c16c3fd92ffef814a5865a571a87a05608ff1fb0903e2f2b5faa885a68"
+  },
+  {
+    "path": "scripts/list-tables.js",
+    "size": 589,
+    "mtimeMs": 1767896684035.4692,
+    "sha256": "413d94529c0eaf32db43b19b9529ae40731afba4a8c21ef7446920a831820362"
+  },
+  {
+    "path": "server.js",
+    "size": 59135,
+    "mtimeMs": 1768316465163.7024,
+    "sha256": "3f45d773861ed6060e68a150d6e660de7e754c71931de57ca52c8fb2b6867050"
+  },
+  {
+    "path": "server.log",
+    "size": 2418,
+    "mtimeMs": 1767989810748.262,
+    "sha256": "2fa375a3237c2778794f532d5b41c35d29ef1cd0f12b48c4566243db0827b704"
+  },
+  {
+    "path": "server_output.log",
+    "size": 5380,
+    "mtimeMs": 1767990221517.1372,
+    "sha256": "5a5d93fdd3bc34468ffad9b1bcbbbd2088d88b00172b53b0bafe955c747d1f32"
+  },
+  {
+    "path": "sqlite_migration.sql",
+    "size": 5730,
+    "mtimeMs": 1767897044526.0847,
+    "sha256": "45a505da32a453b916488e7f5f47edebec50f544dcd9ef8f26d96441a90224c3"
+  },
+  {
+    "path": "start_sessie.html",
+    "size": 3855,
+    "mtimeMs": 1767962452658.5854,
+    "sha256": "9d86fc76bf66f985152e03f4aa2611b621f0057bdfcb577edcbd34e7863910a0"
+  },
+  {
+    "path": "vraag_handler.html",
+    "size": 25739,
+    "mtimeMs": 1768316247868.9465,
+    "sha256": "015ebffd72d64dcc0e3864effdc9d37fb790fe44d68e6f077f4c7d1874476f74"
+  }
+]

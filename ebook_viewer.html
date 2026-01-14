@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Boek Viewer</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+  </head>
+  <body>
+    <div class="container card" style="max-width: 900px; margin: 40px auto">
+      <h2 id="title">Boek laden...</h2>
+      <p id="desc"></p>
+      <div id="content">
+        Als het boek geladen is, verschijnen hier de hoofdstukken.
+      </div>
+      <div style="margin-top: 12px">
+        <a href="dashboard.html">Terug naar dashboard</a>
+      </div>
+    </div>
+    <script>
+      (async function () {
+        const token = localStorage.getItem("token");
+        if (!token) return (window.location = "login.html");
+        try {
+          const res = await fetch("/my-current-ebook", {
+            headers: { Authorization: "Bearer " + token },
+          });
+          if (!res.ok) {
+            document.getElementById("title").textContent =
+              "Kon boek niet laden";
+            return;
+          }
+          const j = await res.json();
+          if (!j.id) {
+            document.getElementById("title").textContent =
+              "Geen boek geselecteerd";
+            return;
+          }
+          document.getElementById("title").textContent =
+            j.book?.titel || "Onbekend boek";
+          document.getElementById("desc").textContent =
+            j.book?.omschrijving || "";
+          // TODO: load actual book content from server or static files
+        } catch (err) {
+          document.getElementById("title").textContent = "Fout bij laden";
+          console.error(err);
+        }
+      })();
+    </script>
+  </body>
+</html>

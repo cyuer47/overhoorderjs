@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Start overhoring</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="https://overhoren.ivenboxem.nl/assets/img/logo2.png"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <a href="dashboard.html" class="btn-text">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="var(--svg-icons)"
+        >
+          <path
+            d="m368-417 202 202-90 89-354-354 354-354 90 89-202 202h466v126H368Z"
+          />
+        </svg>
+      </a>
+      <h1 class="app-title">Start overhoring</h1>
+      <p class="helper" id="klas-naam"></p>
+
+      <div class="card" id="main-card">
+        <p class="helper">Laden...</p>
+      </div>
+    </div>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const klasId = params.get("klas");
+      if (!klasId) {
+        alert("Geen klas gekozen");
+        window.location = "dashboard.html";
+      }
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location =
+          "login.html?redirecturi=" +
+          encodeURIComponent("start_sessie.html?klas=" + klasId);
+      }
+      const headers = {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      };
+
+      async function load() {
+        const res = await fetch("/klas/" + klasId, { headers });
+        if (!res.ok) {
+          alert("Fout bij laden klas.");
+          window.location = "dashboard.html";
+          return;
+        }
+        const data = await res.json();
+        document.getElementById("klas-naam").innerHTML =
+          "Klas: <strong>" + (data.klas.naam || "") + "</strong>";
+        const card = document.getElementById("main-card");
+        if (!data.vragenlijsten || data.vragenlijsten.length === 0) {
+          card.innerHTML = `<div class="card"><p class="helper">Deze klas heeft nog geen vragenlijsten. Maak eerst een vragenlijst aan via <strong>Beheer klas</strong>.</p><a class="btn-primary" href="manage_klas.html?klas=${klasId}">Ga naar klasbeheer</a></div>`;
+          return;
+        }
+        const options = data.vragenlijsten
+          .map((v) => `<option value="${v.id}">${v.naam}</option>`)
+          .join("");
+        card.innerHTML = `
+    <h3>Kies een vragenlijst</h3>
+    <form id="start-form">
+      <label>Vragenlijst</label>
+      <select name="vragenlijst_id" required>
+        <option value="">Selecteer een vragenlijst...</option>
+        ${options}
+      </select>
+      <div style="margin-top:12px;">
+        <button class="btn-primary" type="submit">Start overhoring</button>
+      </div>
+    </form>
+  `;
+        document.getElementById("start-form").onsubmit = async (e) => {
+          e.preventDefault();
+          const vId = e.target.vragenlijst_id.value;
+          if (!vId) return;
+          // Use GET + token in query to avoid preflight and ensure browser can call it without CORS preflight
+          const token = localStorage.getItem("token");
+          const q = new URLSearchParams({
+            klas_id: klasId,
+            vragenlijst_id: vId,
+            token,
+          });
+          const r = await fetch("/start-sessie?" + q.toString());
+          if (!r.ok) {
+            const err = await r.json().catch(() => ({}));
+            alert("Fout bij starten sessie: " + (err.error || r.status));
+            return;
+          }
+          const data = await r.json();
+          window.location = "vraag_handler.html?sessie=" + data.id;
+        };
+      }
+      window.onload = load;
+    </script>
+  </body>
+</html>

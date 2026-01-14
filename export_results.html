@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Export resultaten</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Resultaten exporteren</h1>
+      <p>
+        Gebruik dit scherm om de resultaten van een sessie als CSV te
+        downloaden.
+      </p>
+      <label>Sessie ID</label>
+      <input id="sessieId" placeholder="Voer sessie id in" />
+      <div style="margin-top: 12px">
+        <button id="downloadBtn" class="btn-primary">Download CSV</button>
+      </div>
+      <div id="msg" style="margin-top: 12px"></div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      if (!token) {
+        document.getElementById("msg").innerText =
+          "Niet ingelogd. Log eerst in.";
+      }
+
+      document
+        .getElementById("downloadBtn")
+        .addEventListener("click", async () => {
+          const id = document.getElementById("sessieId").value.trim();
+          if (!id) return alert("Voer sessie id in");
+          try {
+            const res = await fetch(
+              "/sessies/" + encodeURIComponent(id) + "/export",
+              { headers: { Authorization: "Bearer " + token } }
+            );
+            if (!res.ok) {
+              const t = await res.text();
+              throw new Error(t || res.statusText);
+            }
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `sessie_${id}_resultaten.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+          } catch (err) {
+            console.error(err);
+            alert("Fout bij downloaden: " + (err.message || err));
+          }
+        });
+    </script>
+  </body>
+</html>
