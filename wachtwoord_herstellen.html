@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Wachtwoord Herstellen - Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/material3.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      @supports (view-transition-name: none) {
+        html {
+          view-transition-name: root;
+        }
+    }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <main class="main-content" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+        <section class="card fade-in" style="max-width: 480px; width: 100%;">
+          <div class="card-header" style="text-align: center; margin-bottom: var(--space-xl);">
+            <button class="btn-secondary" onclick="window.location='login.html'" style="position: absolute; top: var(--space-lg); left: var(--space-lg);">
+              <svg width="20" height="20" viewBox="0 -960 960 960" fill="currentColor" style="margin-right: var(--space-sm);">
+                <path d="m368-417 202 202-90 89-354-354 354-354 90 89-202 202h466v126H368Z"/>
+              </svg>
+              Terug
+            </button>
+            
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--md-sys-color-tertiary), var(--md-sys-color-primary)); border-radius: var(--md-sys-shape-corner-extra-large); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-lg); animation: float 3s ease-in-out infinite;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="11" width="18" height="10" rx="2" ry="2" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9 12L11 14L15 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h1 style="margin: 0; color: var(--md-sys-color-on-surface); font-size: 2rem; font-weight: 700;">Wachtwoord Herstellen</h1>
+            <p class="helper" style="margin: 0;">Kies een nieuw wachtwoord voor je account</p>
+          </div>
+
+          <div id="noToken" class="notification error" style="display: none; margin-bottom: var(--space-md);">
+            Ongeldige of ontbrekende herstellink. Vraag een nieuwe herstellink aan.
+          </div>
+
+          <form id="resetForm" class="form" style="display: none;">
+            <input type="hidden" name="token" id="token" />
+            <div id="error" class="notification error" style="display: none; margin-bottom: var(--space-md);"></div>
+            <div id="message" class="notification success" style="display: none; margin-bottom: var(--space-md);"></div>
+            
+            <div class="form-group">
+              <label for="password">Nieuw wachtwoord</label>
+              <input type="password" name="password" id="password" required minlength="6" placeholder="Minimaal 6 tekens..." />
+            </div>
+
+            <div class="form-group">
+              <label for="password2">Herhaal nieuw wachtwoord</label>
+              <input type="password" name="password2" id="password2" required minlength="6" placeholder="Herhaal wachtwoord..." />
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: var(--space-lg);">
+              <span>Wachtwoord Wijzigen</span>
+            </button>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      // Load identicon utility
+      const script = document.createElement('script');
+      script.src = 'utils/identicon.js';
+      document.head.appendChild(script);
+
+      // Get token from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const resetForm = document.getElementById('resetForm');
+      const noTokenDiv = document.getElementById('noToken');
+
+      if (!token) {
+        noTokenDiv.style.display = 'block';
+        resetForm.style.display = 'none';
+      } else {
+        document.getElementById('token').value = token;
+        resetForm.style.display = 'block';
+        noTokenDiv.style.display = 'none';
+      }
+
+      // Reset password form handler
+      resetForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalContent = submitBtn.innerHTML;
+        const errorDiv = document.getElementById("error");
+        const messageDiv = document.getElementById("message");
+        
+        submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416"/></svg><span>Wijzigen...</span>`;
+        submitBtn.disabled = true;
+        errorDiv.style.display = 'none';
+        messageDiv.style.display = 'none';
+
+        const formData = new FormData(e.target);
+        const password = formData.get("password");
+        const password2 = formData.get("password2");
+
+        // Validate passwords match
+        if (password !== password2) {
+          errorDiv.textContent = "Wachtwoorden komen niet overeen";
+          errorDiv.style.display = 'block';
+          submitBtn.innerHTML = originalContent;
+          submitBtn.disabled = false;
+          return;
+        }
+
+        try {
+          const res = await fetch("/api/auth/reset", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token, password }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error || "Kon wachtwoord niet wijzigen");
+          }
+
+          // Show success message
+          messageDiv.textContent = "Wachtwoord succesvol gewijzigd! Je wordt doorgestuurd naar de login pagina...";
+          messageDiv.style.display = 'block';
+          
+          // Redirect after delay
+          setTimeout(() => {
+            if (document.startViewTransition) {
+              document.startViewTransition(() => {
+                window.location = "login.html";
+              });
+            } else {
+              window.location = "login.html";
+            }
+          }, 2000);
+        } catch (err) {
+          errorDiv.textContent = err.message;
+          errorDiv.style.display = 'block';
+          submitBtn.innerHTML = originalContent;
+          submitBtn.disabled = false;
+        }
+      });
+
+      // Show notification helper
+      function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.style.animation = 'slideOutRight 0.3s ease-out';
+          setTimeout(() => notification.remove(), 300);
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>

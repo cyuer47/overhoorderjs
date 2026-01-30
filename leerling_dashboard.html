@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Leerling Dashboard - Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/material3.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      @supports (view-transition-name: none) {
+        html {
+          view-transition-name: root;
+        }
+      }
+      
+      /* Dashboard styles */
+      .welcome-section {
+        background: linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-secondary));
+        color: var(--md-sys-color-on-primary);
+        padding: var(--space-xl);
+        border-radius: var(--md-sys-shape-corner-large);
+        text-align: center;
+        margin-bottom: var(--space-lg);
+      }
+      
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-md);
+        margin-bottom: var(--space-lg);
+      }
+      
+      .stat-card {
+        background-color: var(--md-sys-color-surface-container);
+        padding: var(--space-lg);
+        border-radius: var(--md-sys-shape-corner-medium);
+        text-align: center;
+        border: 1px solid var(--md-sys-color-outline);
+      }
+      
+      .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--md-sys-color-primary);
+        margin: 0 0 var(--space-xs) 0;
+      }
+      
+      .stat-label {
+        color: var(--md-sys-color-on-surface-variant);
+        font-size: 0.875rem;
+        margin: 0;
+      }
+      
+      .session-card {
+        background-color: var(--md-sys-color-surface-container);
+        padding: var(--space-lg);
+        border-radius: var(--md-sys-shape-corner-medium);
+        border: 1px solid var(--md-sys-color-outline);
+        margin-bottom: var(--space-md);
+        transition: all var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized);
+      }
+      
+      .session-card:hover {
+        background-color: var(--md-sys-color-surface-container-high);
+        box-shadow: var(--md-sys-elevation-level1);
+        transform: translateY(-1px);
+      }
+      
+      .session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-sm);
+      }
+      
+      .session-title {
+        color: var(--md-sys-color-on-surface);
+        font-weight: 600;
+        margin: 0;
+      }
+      
+      .session-status {
+        padding: var(--space-xs) var(--space-sm);
+        border-radius: var(--md-sys-shape-corner-small);
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+      
+      .status-active {
+        background-color: var(--md-sys-color-tertiary-container);
+        color: var(--md-sys-color-on-tertiary-container);
+      }
+      
+      .session-meta {
+        color: var(--md-sys-color-on-surface-variant);
+        font-size: 0.875rem;
+        margin-bottom: var(--space-md);
+      }
+      
+      .no-sessions {
+        text-align: center;
+        padding: var(--space-xl);
+        color: var(--md-sys-color-on-surface-variant);
+      }
+      
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-md);
+        margin-bottom: var(--space-lg);
+      }
+      
+      .info-item {
+        padding: var(--space-md);
+        background-color: var(--md-sys-color-surface-container-high);
+        border-radius: var(--md-sys-shape-corner-small);
+      }
+      
+      .card {
+        background-color: var(--md-sys-color-surface-container);
+        border-radius: var(--md-sys-shape-corner-large);
+        border: 1px solid var(--md-sys-color-outline);
+        overflow: hidden;
+      }
+      
+      .card-header {
+        padding: var(--space-lg);
+        background-color: var(--md-sys-color-primary-container);
+        border-bottom: 1px solid var(--md-sys-color-outline);
+      }
+      
+      .card-header h2 {
+        margin: 0;
+        color: var(--md-sys-color-on-primary-container);
+      }
+      
+      .card-content {
+        padding: var(--space-lg);
+      }
+      
+      .session-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+        margin-top: var(--space-md);
+      }
+      
+      .session-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-md);
+        background-color: var(--md-sys-color-surface-container-high);
+        border-radius: var(--md-sys-shape-corner-medium);
+        border: 1px solid var(--md-sys-color-outline);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="header-content">
+          <button class="btn-secondary" onclick="dashboard.logout()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: var(--space-sm);">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="16 17 21 12 16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Uitloggen
+          </button>
+          <div class="chip">Overhoorder • Leerling</div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div id="app">
+          <div class="waiting-state">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-secondary)); border-radius: var(--md-sys-shape-corner-extra-large); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-lg); animation: float 3s ease-in-out infinite;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="9" cy="7" r="4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h2 style="color: var(--md-sys-color-on-surface); margin: 0 0 var(--space-sm) 0;">Laden...</h2>
+            <p class="helper">Dashboard wordt geladen</p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Load identicon utility
+      const script = document.createElement('script');
+      script.src = 'utils/identicon.js';
+      document.head.appendChild(script);
+
+      class LearnerDashboard {
+        constructor() {
+          this.token = localStorage.getItem("learnerToken");
+          this.learnerData = JSON.parse(localStorage.getItem("learnerData") || '{}');
+          this.init();
+        }
+
+        init() {
+          if (!this.token) {
+            window.location = "leerling_login.html";
+            return;
+          }
+
+          this.loadDashboard();
+        }
+
+        async loadDashboard() {
+          try {
+            const response = await fetch('/learner/dashboard', {
+              headers: {
+                'Authorization': `Bearer ${this.token}`
+              }
+            });
+
+            if (!response.ok) {
+              throw new Error('Kon dashboard niet laden');
+            }
+
+            const data = await response.json();
+            this.renderDashboard(data);
+          } catch (error) {
+            console.error('Error loading dashboard:', error);
+            this.showError('Kon dashboard niet laden');
+          }
+        }
+
+        renderDashboard(data) {
+          const app = document.getElementById('app');
+          
+          app.innerHTML = `
+            <div class="welcome-section fade-in">
+              <h1 style="margin: 0 0 var(--space-md) 0; font-size: 2rem;">Welkom terug, ${this.escapeHtml(data.learner.naam)}!</h1>
+              <p class="helper" style="margin: 0;">Klaar om te overhoren</p>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card fade-in">
+                <div class="stat-number">${data.klassen.length}</div>
+                <div class="stat-label">Klassen</div>
+              </div>
+              <div class="stat-card fade-in" style="animation-delay: 0.1s;">
+                <div class="stat-number">${data.sessions.length}</div>
+                <div class="stat-label">Actieve Sessies</div>
+              </div>
+              <div class="stat-card fade-in" style="animation-delay: 0.2s;">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Resultaten</div>
+              </div>
+            </div>
+
+            <div class="dashboard-grid">
+              <section class="card fade-in" style="animation-delay: 0.3s;">
+                <div class="card-header">
+                  <h3>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                      <path d="M9 11H15V21H9V11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M3 21V7C3 5.89543 3.89543 5 5 5H19C20.1046 5 21 5.89543 21 7V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M12 3V5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Actieve Sessies
+                  </h3>
+                </div>
+                <div id="sessionsList"></div>
+              </section>
+
+              <section class="card fade-in" style="animation-delay: 0.4s;">
+                <div class="card-header">
+                  <h3>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Mijn Klassen
+                  </h3>
+                </div>
+                <div id="klassenList"></div>
+              </section>
+            </div>
+          `;
+
+          this.renderSessions(data.sessions);
+          this.renderKlassen(data.klassen);
+        }
+
+        renderSessions(sessions) {
+          const container = document.getElementById('sessionsList');
+          
+          if (sessions.length === 0) {
+            container.innerHTML = `
+              <div class="no-sessions">
+                <div style="width: 64px; height: 64px; background: linear-gradient(135deg, var(--md-sys-color-surface-variant), var(--md-sys-color-surface-container-high)); border-radius: var(--md-sys-shape-corner-large); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md);">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <h4 style="color: var(--md-sys-color-on-surface-variant); margin-bottom: var(--space-sm);">Geen Actieve Sessies</h4>
+                <p class="helper">Er zijn momenteel geen actieve overhoringen</p>
+              </div>
+            `;
+            return;
+          }
+
+          container.innerHTML = '';
+          sessions.forEach((session, index) => {
+            const sessionCard = document.createElement('div');
+            sessionCard.className = 'session-card';
+            sessionCard.style.animationDelay = `${index * 0.05}s`;
+            sessionCard.className += ' slide-in';
+            
+            sessionCard.innerHTML = `
+              <div class="session-header">
+                <h3 class="session-title">${this.escapeHtml(session.vragenlijst_titel || 'Overhoring')}</h3>
+                <span class="session-status status-active">Actief</span>
+              </div>
+              <div class="session-meta">
+                <div>Klas: ${this.escapeHtml(session.klas_naam)}</div>
+                <div>Code: ${this.escapeHtml(session.klascode)}</div>
+                <div>Gestart: ${new Date(session.started_at).toLocaleString()}</div>
+              </div>
+              <button class="btn-primary" onclick="dashboard.joinSession(${session.id})">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: var(--space-sm);">
+                  <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Deelnemen
+              </button>
+            `;
+            
+            container.appendChild(sessionCard);
+          });
+        }
+
+        renderKlassen(klassen) {
+          const container = document.getElementById('klassenList');
+          
+          if (klassen.length === 0) {
+            container.innerHTML = '<p class="helper">Je bent nog niet aangemeld bij een klas</p>';
+            return;
+          }
+
+          container.innerHTML = '';
+          klassen.forEach((klas, index) => {
+            const klasCard = document.createElement('div');
+            klasCard.className = 'session-card';
+            klasCard.style.animationDelay = `${index * 0.05}s`;
+            klasCard.className += ' slide-in';
+            
+            klasCard.innerHTML = `
+              <div class="session-header">
+                <h3 class="session-title">${this.escapeHtml(klas.naam)}</h3>
+              </div>
+              <div class="session-meta">
+                <div>Code: ${this.escapeHtml(klas.klascode)}</div>
+                <div>Vak: ${this.escapeHtml(klas.vak || 'N/A')}</div>
+              </div>
+              <div style="margin-top: var(--space-md);">
+                <button class="btn-secondary" onclick="dashboard.viewKlas(${klas.id})">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: var(--space-sm);">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Bekijken
+                </button>
+              </div>
+            `;
+            
+            container.appendChild(klasCard);
+          });
+        }
+
+        joinSession(sessionId) {
+          window.location.href = `leerling.html?session=${sessionId}`;
+        }
+
+        async viewKlas(klasId) {
+          try {
+            const token = localStorage.getItem('learnerToken');
+            const response = await fetch(`/learner/klas/${klasId}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+
+            if (!response.ok) {
+              throw new Error('Kon klas gegevens niet laden');
+            }
+
+            const klasData = await response.json();
+            this.renderKlasDetails(klasData);
+          } catch (error) {
+            console.error('Error loading klas details:', error);
+            this.showError('Kon klas gegevens niet laden');
+          }
+        }
+
+        renderKlasDetails(klasData) {
+          const app = document.getElementById('app');
+          app.innerHTML = `
+            <div class="fade-in">
+              <button class="btn-secondary" onclick="dashboard.loadDashboard()" style="margin-bottom: var(--space-lg);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: var(--space-sm);">
+                  <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Terug naar Dashboard
+              </button>
+              
+              <div class="card">
+                <div class="card-header">
+                  <h2>${this.escapeHtml(klasData.klas.naam)}</h2>
+                </div>
+                <div class="card-content">
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <strong>Klascode:</strong> ${this.escapeHtml(klasData.klas.klascode)}
+                    </div>
+                    <div class="info-item">
+                      <strong>Vak:</strong> ${this.escapeHtml(klasData.klas.vak || 'N/A')}
+                    </div>
+                    <div class="info-item">
+                      <strong>Aantal Leerlingen:</strong> ${klasData.leerlingen ? klasData.leerlingen.length : 0}
+                    </div>
+                    <div class="info-item">
+                      <strong>Actieve Sessies:</strong> ${klasData.active_sessions ? klasData.active_sessions.length : 0}
+                    </div>
+                  </div>
+                  
+                  ${klasData.active_sessions && klasData.active_sessions.length > 0 ? `
+                    <div style="margin-top: var(--space-lg);">
+                      <h3>Actieve Sessies</h3>
+                      <div class="session-list">
+                        ${klasData.active_sessions.map(session => `
+                          <div class="session-item">
+                            <div>
+                              <strong>${this.escapeHtml(session.vragenlijst_titel || 'Onbekend')}</strong>
+                              <div class="helper">Gestart: ${new Date(session.started_at).toLocaleString()}</div>
+                            </div>
+                            <button class="btn-primary" onclick="dashboard.joinSession(${session.id})">
+                              Deelnemen
+                            </button>
+                          </div>
+                        `).join('')}
+                      </div>
+                    </div>
+                  ` : '<p class="helper">Geen actieve sessies</p>'}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        logout() {
+          localStorage.removeItem('learnerToken');
+          localStorage.removeItem('learnerData');
+          window.location = 'leerling_login.html';
+        }
+
+        showError(message) {
+          const app = document.getElementById('app');
+          app.innerHTML = `
+            <div class="notification error" style="margin: var(--space-lg);">
+              ${message}
+            </div>
+            <div style="text-align: center; margin-top: var(--space-lg);">
+              <button class="btn-primary" onclick="window.location.reload()">
+                Opnieuw Proberen
+              </button>
+            </div>
+          `;
+        }
+
+        showNotification(message, type = 'info') {
+          const notification = document.createElement('div');
+          notification.className = `notification ${type}`;
+          notification.textContent = message;
+          document.body.appendChild(notification);
+          
+          setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => notification.remove(), 300);
+          }, 3000);
+        }
+
+        escapeHtml(text) {
+          if (!text) return '';
+          return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        }
+      }
+
+      // Initialize dashboard
+      const dashboard = new LearnerDashboard();
+    </script>
+  </body>
+</html>

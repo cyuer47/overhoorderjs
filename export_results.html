@@ -2,59 +2,198 @@
 <html lang="nl">
   <head>
     <meta charset="utf-8" />
-    <title>Export resultaten</title>
-    <link rel="stylesheet" href="assets/css/styles.css" />
+    <title>Export Resultaten - Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/material3.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      @supports (view-transition-name: none) {
+        html {
+          view-transition-name: root;
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="container">
-      <h1>Resultaten exporteren</h1>
-      <p>
-        Gebruik dit scherm om de resultaten van een sessie als CSV te
-        downloaden.
-      </p>
-      <label>Sessie ID</label>
-      <input id="sessieId" placeholder="Voer sessie id in" />
-      <div style="margin-top: 12px">
-        <button id="downloadBtn" class="btn-primary">Download CSV</button>
-      </div>
-      <div id="msg" style="margin-top: 12px"></div>
+      <header class="header">
+        <div class="header-content">
+          <button class="btn-secondary" onclick="window.location='dashboard.html'">
+            <svg width="20" height="20" viewBox="0 -960 960 960" fill="currentColor" style="margin-right: var(--space-sm);">
+              <path d="m368-417 202 202-90 89-354-354 354-354 90 89-202 202h466v126H368Z"/>
+            </svg>
+            Terug
+          </button>
+          <div class="chip">Overhoorder • Export</div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="dashboard-grid">
+          <section class="card fade-in">
+            <div class="card-header">
+              <h3>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Resultaten Exporteren
+              </h3>
+            </div>
+            <p class="helper">Gebruik dit scherm om de resultaten van een sessie als CSV te downloaden.</p>
+            
+            <form id="exportForm" class="form">
+              <div class="form-group">
+                <label for="sessieId">Sessie ID</label>
+                <input id="sessieId" name="sessieId" placeholder="Voer sessie ID in..." required />
+                <p class="helper">Vind de sessie ID in de sessie URL of vraag handler</p>
+              </div>
+              
+              <button type="submit" class="btn-primary" id="downloadBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: var(--space-sm);">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Download CSV
+              </button>
+            </form>
+            
+            <div id="msg" class="notification" style="display: none;"></div>
+          </section>
+
+          <section class="card fade-in" style="animation-delay: 0.1s;">
+            <div class="card-header">
+              <h3>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                  <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23.15L12 24L16.38 23.15C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                  Instructies
+              </h3>
+            </div>
+            <div class="form">
+              <h4 style="color: var(--md-sys-color-on-surface); margin-bottom: var(--space-md);">Hoe vind je de sessie ID?</h4>
+              <ol style="color: var(--md-sys-color-on-surface); line-height: 1.6;">
+                <li>Open de vraag handler pagina van een sessie</li>
+                <li>De sessie ID staat in de URL: <code style="background: var(--md-sys-color-surface-variant); padding: var(--space-xs) var(--space-sm); border-radius: var(--md-sys-shape-corner-small);">vraag_handler.html?session=<strong>12345</strong></code></li>
+                <li>Kopieer het nummer (in dit voorbeeld: 12345)</li>
+                <li>Plak het in het veld hierboven</li>
+              </ol>
+              
+              <h4 style="color: var(--md-sys-color-on-surface); margin: var(--space-lg) 0 var(--space-md) 0;">Wat bevat de CSV export?</h4>
+              <ul style="color: var(--md-sys-color-on-surface); line-height: 1.6;">
+                <li>Leerling naam</li>
+                <li>Totaal aantal vragen</li>
+                <li>Aantal correcte antwoorden</li>
+                <li>Score percentage</li>
+                <li>Tijdstip van laatste activiteit</li>
+              </ul>
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
 
     <script>
-      const token = localStorage.getItem("token");
-      if (!token) {
-        document.getElementById("msg").innerText =
-          "Niet ingelogd. Log eerst in.";
-      }
+      // Load identicon utility
+      const script = document.createElement('script');
+      script.src = 'utils/identicon.js';
+      document.head.appendChild(script);
 
-      document
-        .getElementById("downloadBtn")
-        .addEventListener("click", async () => {
-          const id = document.getElementById("sessieId").value.trim();
-          if (!id) return alert("Voer sessie id in");
+      class ExportManager {
+        constructor() {
+          this.token = localStorage.getItem("token");
+          this.init();
+        }
+
+        init() {
+          if (!this.token) {
+            this.showError('Niet ingelogd. Log eerst in.');
+            document.getElementById('downloadBtn').disabled = true;
+            return;
+          }
+
+          this.setupEventListeners();
+        }
+
+        setupEventListeners() {
+          document.getElementById('exportForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.exportResults();
+          });
+        }
+
+        async exportResults() {
+          const sessieId = document.getElementById('sessieId').value.trim();
+          const downloadBtn = document.getElementById('downloadBtn');
+          const originalContent = downloadBtn.innerHTML;
+          
+          if (!sessieId) {
+            this.showError('Voer een sessie ID in');
+            return;
+          }
+
+          downloadBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416"/></svg><span>Exporteren...</span>`;
+          downloadBtn.disabled = true;
+
           try {
-            const res = await fetch(
-              "/sessies/" + encodeURIComponent(id) + "/export",
-              { headers: { Authorization: "Bearer " + token } }
-            );
-            if (!res.ok) {
-              const t = await res.text();
-              throw new Error(t || res.statusText);
+            const response = await fetch(`/sessies/${sessieId}/export`, {
+              headers: { Authorization: `Bearer ${this.token}` }
+            });
+
+            if (!response.ok) {
+              const error = await response.json().catch(() => ({}));
+              throw new Error(error.error || 'Kon resultaten niet exporteren');
             }
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
             a.href = url;
-            a.download = `sessie_${id}_resultaten.csv`;
+            a.download = `sessie-${sessieId}-resultaten.csv`;
             document.body.appendChild(a);
             a.click();
-            a.remove();
-            URL.revokeObjectURL(url);
-          } catch (err) {
-            console.error(err);
-            alert("Fout bij downloaden: " + (err.message || err));
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            this.showSuccess('Resultaten succesvol geëxporteerd!');
+          } catch (error) {
+            console.error('Error exporting results:', error);
+            this.showError(error.message || 'Kon resultaten niet exporteren');
+          } finally {
+            downloadBtn.innerHTML = originalContent;
+            downloadBtn.disabled = false;
           }
-        });
+        }
+
+        showSuccess(message) {
+          const msgDiv = document.getElementById('msg');
+          msgDiv.textContent = message;
+          msgDiv.className = 'notification success';
+          msgDiv.style.display = 'block';
+          
+          setTimeout(() => {
+            msgDiv.style.display = 'none';
+          }, 5000);
+        }
+
+        showError(message) {
+          const msgDiv = document.getElementById('msg');
+          msgDiv.textContent = message;
+          msgDiv.className = 'notification error';
+          msgDiv.style.display = 'block';
+          
+          setTimeout(() => {
+            msgDiv.style.display = 'none';
+          }, 5000);
+        }
+      }
+
+      // Initialize export manager
+      const exportManager = new ExportManager();
     </script>
   </body>
 </html>

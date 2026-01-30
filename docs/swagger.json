@@ -37,11 +37,23 @@
                 "email": { "type": "string" },
                 "password": { "type": "string" },
                 "naam": { "type": "string" }
-              }
+              },
+              "required": ["email", "password", "naam"]
             }
           }
         ],
-        "responses": { "200": { "description": "Registratie gelukt" } }
+        "responses": { 
+          "200": { 
+            "description": "Registratie gelukt",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": { "type": "string" },
+                "user": { "$ref": "#/definitions/User" }
+              }
+            }
+          }
+        }
       }
     },
     "/login": {
@@ -57,24 +69,156 @@
               "properties": {
                 "email": { "type": "string" },
                 "password": { "type": "string" }
-              }
+              },
+              "required": ["email", "password"]
             }
           }
         ],
-        "responses": { "200": { "description": "Login gelukt" } }
+        "responses": { 
+          "200": { 
+            "description": "Login gelukt",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": { "type": "string" },
+                "user": { "$ref": "#/definitions/User" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/forgot": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Wachtwoord vergeten",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "string" }
+              },
+              "required": ["email"]
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Reset email verstuurd" } }
+      }
+    },
+    "/api/auth/reset": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Wachtwoord resetten",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": { "type": "string" },
+                "password": { "type": "string" }
+              },
+              "required": ["token", "password"]
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Wachtwoord gereset" } }
       }
     },
     "/me": {
       "get": {
         "tags": ["auth"],
         "summary": "Informatie over de ingelogde gebruiker",
-        "responses": { "200": { "description": "Succesvol" } }
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": { 
+          "200": { 
+            "description": "Succesvol",
+            "schema": { "$ref": "#/definitions/User" }
+          }
+        }
+      }
+    },
+    "/update-profile": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Profiel bijwerken",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "naam": { "type": "string" }
+              },
+              "required": ["naam"]
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Profiel bijgewerkt" } }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Logout",
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": { "200": { "description": "Uitgelogd" } }
+      }
+    },
+    "/change-password": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Wachtwoord veranderen",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "currentPassword": { "type": "string" },
+                "newPassword": { "type": "string" }
+              },
+              "required": ["currentPassword", "newPassword"]
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Wachtwoord veranderd" } }
+      }
+    },
+    "/delete-account": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Account verwijderen",
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": { "200": { "description": "Account verwijderd" } }
+      }
+    },
+    "/dashboard-data": {
+      "get": {
+        "tags": ["docent"],
+        "summary": "Dashboard data ophalen",
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": { 
+          "200": { 
+            "description": "Dashboard data",
+            "schema": { "$ref": "#/definitions/DashboardData" }
+          }
+        }
       }
     },
     "/create-klas": {
       "post": {
         "tags": ["docent"],
         "summary": "Nieuwe klas aanmaken",
+        "security": [{ "ApiKeyAuth": [] }],
         "parameters": [
           {
             "in": "body",
@@ -83,12 +227,285 @@
               "type": "object",
               "properties": {
                 "naam": { "type": "string" },
+                "klascode": { "type": "string" },
                 "vak": { "type": "string" }
-              }
+              },
+              "required": ["naam", "klascode"]
             }
           }
         ],
         "responses": { "200": { "description": "Klas aangemaakt" } }
+      }
+    },
+    "/search": {
+      "get": {
+        "tags": ["docent"],
+        "summary": "Zoek docenten",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": { "200": { "description": "Zoekresultaten" } }
+      }
+    },
+    "/learner/register": {
+      "post": {
+        "tags": ["leerling"],
+        "summary": "Leerling registreren",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "naam": { "type": "string" },
+                "email": { "type": "string" },
+                "password": { "type": "string" },
+                "klas_id": { "type": "integer" }
+              },
+              "required": ["naam", "klas_id"]
+            }
+          }
+        ],
+        "responses": { 
+          "200": { 
+            "description": "Registratie gelukt",
+            "schema": { "$ref": "#/definitions/JoinResponse" }
+          }
+        }
+      }
+    },
+    "/learner/login": {
+      "post": {
+        "tags": ["leerling"],
+        "summary": "Leerling login",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "string" },
+                "password": { "type": "string" }
+              },
+              "required": ["email", "password"]
+            }
+          }
+        ],
+        "responses": { 
+          "200": { 
+            "description": "Login gelukt",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": { "type": "string" },
+                "learner": { "$ref": "#/definitions/Learner" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/learner/join-with-klascode": {
+      "post": {
+        "tags": ["leerling"],
+        "summary": "Deelnemen met klascode",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "naam": { "type": "string" },
+                "klascode": { "type": "string" }
+              },
+              "required": ["naam", "klascode"]
+            }
+          }
+        ],
+        "responses": { 
+          "200": { 
+            "description": "Deelnemen gelukt",
+            "schema": { "$ref": "#/definitions/JoinResponse" }
+          }
+        }
+      }
+    },
+    "/learner/dashboard": {
+      "get": {
+        "tags": ["leerling"],
+        "summary": "Leerling dashboard",
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": { 
+          "200": { 
+            "description": "Dashboard data",
+            "schema": { "$ref": "#/definitions/LearnerDashboard" }
+          }
+        }
+      }
+    },
+    "/learner/klas/{id}": {
+      "get": {
+        "tags": ["leerling"],
+        "summary": "Klas details voor leerling",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": { 
+          "200": { 
+            "description": "Klas details",
+            "schema": { "$ref": "#/definitions/LearnerKlasDetails" }
+          }
+        }
+      }
+    },
+    "/learner/sessions": {
+      "get": {
+        "tags": ["leerling"],
+        "summary": "Leerling sessies",
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": { "200": { "description": "Sessies" } }
+      }
+    },
+    "/learner/results": {
+      "get": {
+        "tags": ["leerling"],
+        "summary": "Leerling resultaten",
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": { "200": { "description": "Resultaten" } }
+      }
+    },
+    "/open-ebook": {
+      "post": {
+        "tags": ["docent"],
+        "summary": "Ebook openen",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "ebook_id": { "type": "integer" }
+              },
+              "required": ["ebook_id"]
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Ebook geopend" } }
+      }
+    },
+    "/my-current-ebook": {
+      "get": {
+        "tags": ["docent"],
+        "summary": "Huidige ebook ophalen",
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": { "200": { "description": "Huidige ebook" } }
+      }
+    },
+    "/admin/create-license": {
+      "post": {
+        "tags": ["admin"],
+        "summary": "Licentie aanmaken",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "licentie_type": { "type": "string" },
+                "docent_id": { "type": "integer" }
+              },
+              "required": ["licentie_type"]
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Licentie aangemaakt" } }
+      }
+    },
+    "/redeem-license": {
+      "post": {
+        "tags": ["admin"],
+        "summary": "Licentie verzilveren",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": { "type": "string" }
+              },
+              "required": ["code"]
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Licentie verzilverd" } }
+      }
+    },
+    "/admin/licenses": {
+      "get": {
+        "tags": ["admin"],
+        "summary": "Licenties ophalen",
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": { "200": { "description": "Licenties" } }
+      }
+    },
+    "/license-usage/{klasId}": {
+      "get": {
+        "tags": ["admin"],
+        "summary": "Licentie gebruik",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          { "name": "klasId", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": { "200": { "description": "Licentie gebruik" } }
+      }
+    },
+    "/ping": {
+      "get": {
+        "tags": ["system"],
+        "summary": "Health check",
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/routes": {
+      "get": {
+        "tags": ["system"],
+        "summary": "Routes lijst",
+        "responses": { "200": { "description": "Routes" } }
+      }
+    },
+    "/who": {
+      "get": {
+        "tags": ["system"],
+        "summary": "Server info",
+        "responses": { "200": { "description": "Server info" } }
+      }
+    },
+    "/list-routes-now": {
+      "get": {
+        "tags": ["system"],
+        "summary": "Routes lijst (nu)",
+        "responses": { "200": { "description": "Routes" } }
+      }
+    },
+    "/_test_sessies": {
+      "get": {
+        "tags": ["system"],
+        "summary": "Test sessies",
+        "responses": { "200": { "description": "Test OK" } }
       }
     },
     "/klas/{id}": {
@@ -484,6 +901,111 @@
     }
   },
   "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "naam": { "type": "string" },
+        "email": { "type": "string" }
+      }
+    },
+    "Learner": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "naam": { "type": "string" },
+        "email": { "type": "string" },
+        "klas_id": { "type": "integer" }
+      }
+    },
+    "DashboardData": {
+      "type": "object",
+      "properties": {
+        "docent": { "$ref": "#/definitions/User" },
+        "klassen": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Klas" }
+        },
+        "vragenlijsten": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Vragenlijst" }
+        },
+        "licenties": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Licentie" }
+        }
+      }
+    },
+    "Klas": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "naam": { "type": "string" },
+        "klascode": { "type": "string" },
+        "vak": { "type": "string" },
+        "docent_id": { "type": "integer" },
+        "leerlingen_count": { "type": "integer" }
+      }
+    },
+    "Vragenlijst": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "naam": { "type": "string" },
+        "klas_id": { "type": "integer" },
+        "vragen_count": { "type": "integer" }
+      }
+    },
+    "Vraag": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "vraag": { "type": "string" },
+        "antwoord": { "type": "string" },
+        "vraag_type": { "type": "string", "enum": ["meerkeuze", "open"] },
+        "options": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "LearnerDashboard": {
+      "type": "object",
+      "properties": {
+        "klassen": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Klas" }
+        },
+        "sessions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Session" }
+        }
+      }
+    },
+    "LearnerKlasDetails": {
+      "type": "object",
+      "properties": {
+        "klas": { "$ref": "#/definitions/Klas" },
+        "active_sessions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Session" }
+        },
+        "learners": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Learner" }
+        }
+      }
+    },
+    "Licentie": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "licentie_type": { "type": "string" },
+        "docent_id": { "type": "integer" },
+        "actief": { "type": "boolean" },
+        "created_at": { "type": "string" }
+      }
+    },
     "Session": {
       "type": "object",
       "properties": {

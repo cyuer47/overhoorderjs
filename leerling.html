@@ -2,788 +2,551 @@
 <html lang="nl">
   <head>
     <meta charset="utf-8" />
-    <title>Leerling</title>
+    <title>Leerling - Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/material3.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="assets/css/styles.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
-      rel="stylesheet"
-    />
     <style>
-      /* Improved learner page styling */
+      @supports (view-transition-name: none) {
+        html {
+          view-transition-name: root;
+        }
+      }
+      
+      /* Learner specific styles */
       .question-card {
-        background: linear-gradient(135deg, #5b3e99 0%, #7c4db6 100%);
-        color: #fff;
-        padding: 30px 20px;
-        border-radius: 18px;
+        background: linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-secondary));
+        color: var(--md-sys-color-on-primary);
+        padding: var(--space-xl) var(--space-lg);
+        border-radius: var(--md-sys-shape-corner-large);
         text-align: center;
-        box-shadow: 0 12px 34px rgba(103, 80, 164, 0.18);
+        box-shadow: var(--md-sys-elevation-level3);
+        margin-bottom: var(--space-lg);
       }
+      
       .score-display {
-        background: linear-gradient(180deg, #fff, #fbfbff);
-        padding: 16px;
-        border-radius: 12px;
+        background-color: var(--md-sys-color-surface-container);
+        padding: var(--space-md);
+        border-radius: var(--md-sys-shape-corner-medium);
         text-align: center;
-        margin-bottom: 18px;
-        border: 1px solid rgba(103, 80, 164, 0.06);
+        margin-bottom: var(--space-lg);
+        border: 1px solid var(--md-sys-color-outline);
       }
+      
       .score-display h3 {
-        margin: 0 0 6px 0;
+        color: var(--md-sys-color-on-surface);
+        margin: 0 0 var(--space-sm) 0;
+        font-size: 1.1rem;
+        font-weight: 600;
       }
-      .score-display #score-display {
-        font-size: 20px;
-        font-weight: 800;
-        color: #2b225c;
+      
+      .answer-options {
+        display: grid;
+        gap: var(--space-md);
+        margin-top: var(--space-lg);
       }
-
-      .answer-form {
-        background: #fff;
-        padding: 18px;
-        border-radius: 12px;
-        border: 1px solid rgba(103, 80, 164, 0.08);
-        margin-top: 18px;
-        box-shadow: 0 6px 18px rgba(103, 80, 164, 0.04);
-      }
-      .answer-form input {
-        font-size: 18px;
-        padding: 14px;
-        text-align: center;
-        border: 1px solid #e9e6f7;
-        border-radius: 10px;
-        width: 100%;
-        box-sizing: border-box;
-      }
-      .answer-form input:focus {
-        border-color: #6750a4;
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(103, 80, 164, 0.08);
-      }
-      .answer-form button {
-        font-size: 18px;
-        padding: 14px 20px;
-        width: 100%;
-        margin-top: 12px;
-        color: white;
-        background: linear-gradient(135deg, #6b4bd1 0%, #7c5ee0 100%);
-        font-weight: 800;
-        border-radius: 12px;
-        border: none;
+      
+      .answer-option {
+        background-color: var(--md-sys-color-surface-container);
+        border: 2px solid var(--md-sys-color-outline);
+        border-radius: var(--md-sys-shape-corner-medium);
+        padding: var(--space-lg);
         cursor: pointer;
-        box-shadow: 0 8px 26px rgba(103, 80, 164, 0.12);
-      }
-      .answer-form button:hover {
-        transform: translateY(-2px);
-      }
-
-      .status-message {
-        padding: 12px 20px;
-        border-radius: 8px;
-        margin: 12px 0;
+        transition: all var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized);
         text-align: center;
-        font-weight: 700;
+        font-weight: 500;
+        color: var(--md-sys-color-on-surface);
       }
-      .status-success {
-        background: #d4edda;
-        color: #155724;
+      
+      .answer-option:hover {
+        border-color: var(--md-sys-color-primary);
+        background-color: var(--md-sys-color-primary-container);
+        transform: translateY(-1px);
+        box-shadow: var(--md-sys-elevation-level1);
       }
-      .status-error {
-        background: #f8d7da;
-        color: #721c24;
+      
+      .answer-option.selected {
+        border-color: var(--md-sys-color-primary);
+        background-color: var(--md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container);
       }
-      .status-info {
-        background: #d1ecf1;
-        color: #0c5460;
+      
+      .answer-option.correct {
+        border-color: var(--md-sys-color-tertiary);
+        background-color: var(--md-sys-color-tertiary-container);
+        color: var(--md-sys-color-on-tertiary-container);
       }
-
-      .waiting-screen {
+      
+      .answer-option.incorrect {
+        border-color: var(--md-sys-color-error);
+        background-color: var(--md-sys-color-error-container);
+        color: var(--md-sys-color-on-error-container);
+      }
+      
+      .waiting-state {
         text-align: center;
-        padding: 48px 20px;
-        color: #666;
+        padding: var(--space-xl);
+        color: var(--md-sys-color-on-surface-variant);
       }
-      .spinner {
-        border: 4px solid #f3f3f4;
-        border-top: 4px solid #6750a4;
-        border-radius: 50%;
-        width: 48px;
-        height: 48px;
-        animation: spin 1s linear infinite;
-        margin: 16px auto;
+      
+      .waiting-state svg {
+        animation: float 3s ease-in-out infinite;
       }
-
-      .completed-screen {
+      
+      .session-ended {
         text-align: center;
-        padding: 28px 16px;
-        background: #f6e6ff;
-        border-radius: 12px;
-        border: 1px solid rgba(103, 80, 164, 0.08);
+        padding: var(--space-xl);
+        background-color: var(--md-sys-color-surface-container);
+        border-radius: var(--md-sys-shape-corner-medium);
+        border: 1px solid var(--md-sys-color-outline);
       }
-
-      .recent-answers {
-        max-height: 260px;
-        overflow-y: auto;
-        margin-top: 12px;
+      
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background-color: var(--md-sys-color-surface-variant);
+        border-radius: var(--md-sys-shape-corner-small);
+        overflow: hidden;
+        margin: var(--space-md) 0;
       }
-      .answer-item {
-        padding: 12px;
-        margin: 8px 0;
-        background: linear-gradient(180deg, #fff, #fbfbff);
-        border-radius: 10px;
-        border-left: 4px solid #eee;
-        box-shadow: 0 6px 18px rgba(43, 34, 92, 0.04);
+      
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--md-sys-color-primary), var(--md-sys-color-secondary));
+        border-radius: var(--md-sys-shape-corner-small);
+        transition: width var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized);
       }
-
-      /* Logout button */
-      #logout-btn {
-        position: absolute;
-        right: 18px;
-        top: 18px;
+      
+      .login-form {
+        background-color: var(--md-sys-color-surface-container);
+        padding: var(--space-xl);
+        border-radius: var(--md-sys-shape-corner-large);
+        border: 1px solid var(--md-sys-color-outline);
+        max-width: 400px;
+        margin: var(--space-xl) auto;
       }
-      .logout-btn {
-        color: #d9534f;
-        font-weight: 700;
-        padding: 8px 12px;
-        border-radius: 8px;
+      
+      .login-form h2 {
+        color: var(--md-sys-color-on-surface);
+        margin: 0 0 var(--space-lg) 0;
+        text-align: center;
       }
-
-      @keyframes spin {
-        from {
-          transform: rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg);
-        }
+      
+      .login-form input {
+        width: 100%;
+        margin-bottom: var(--space-md);
       }
-
-      @media (max-width: 520px) {
-        .question-card {
-          padding: 18px;
-        }
-        .answer-form button {
-          padding: 12px;
-        }
+      
+      .login-info {
+        text-align: center;
+        margin-bottom: var(--space-lg);
+        color: var(--md-sys-color-on-surface-variant);
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <div class="card" id="join-card">
-        <h2>Leerling: doe mee</h2>
-        <div
-          id="error-message"
-          class="status-message status-error"
-          style="display: none"
-        ></div>
-        <form id="join-form">
-          <label>Klascode</label><input name="join_klascode" required />
-          <label>Naam</label><input name="naam" required />
-          <div style="margin-top: 12px">
-            <button class="btn-primary" type="submit">Deelnemen</button>
-          </div>
-        </form>
-      </div>
-      <div class="card" id="main-card" style="display: none">
-        <a href="#" id="logout-btn" class="logout-btn">Uitloggen</a>
-        <div class="score-display">
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              gap: 12px;
-            "
-          >
-            <div>
-              <h3>Jouw Score</h3>
-              <div id="score-display">Laden...</div>
-              <p id="answer-count">Laden...</p>
+      <main class="main-content">
+        <div id="app">
+          <div class="waiting-state">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-secondary)); border-radius: var(--md-sys-shape-corner-extra-large); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-lg);">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23.15L12 24L16.38 23.15C19.77 20.68 22 16.5 22 12V7L12 2Z" fill="white" opacity="0.2"/>
+                <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23.15L12 24L16.38 23.15C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
             </div>
-            <div style="text-align: right">
-              <div
-                id="connection-indicator"
-                class="connection-indicator disconnected"
-              >
-                <span class="dot"></span>Offline
-              </div>
-              <div
-                style="
-                  font-size: 12px;
-                  color: var(--on-surface-variant);
-                  margin-top: 6px;
-                "
-              >
-                Live verbinding
-              </div>
-            </div>
+            <h2 style="color: var(--md-sys-color-on-surface); margin: 0 0 var(--space-sm) 0;">Wachten op overhoring...</h2>
+            <p class="helper">Je docent zal binnenkort een vraag sturen</p>
           </div>
         </div>
-        <div id="question-section" style="display: none">
-          <h3>Beantwoord de vraag:</h3>
-          <p id="question-text">...</p>
-          <input
-            type="text"
-            id="answer-input"
-            placeholder="Typ hier je antwoord..."
-          />
-          <button id="submit-btn" class="btn-primary">Verstuur Antwoord</button>
-        </div>
-        <div id="waiting-section" style="display: none">
-          <h3>Wachten op de volgende vraag</h3>
-          <div class="spinner"></div>
-        </div>
-        <div id="completed-section" style="display: none">
-          <h3>Vraag beantwoord!</h3>
-          <p id="completed-question">...</p>
-          <p id="completed-subtitle">
-            Je hebt deze vraag beantwoord. Wacht op beoordeling...
-          </p>
-        </div>
-        <div>
-          <h3>Jouw recente antwoorden</h3>
-          <div id="recent-answers">Laden...</div>
-        </div>
-      </div>
+      </main>
     </div>
+
     <script>
-      // Student flow using the Node.js API
-      const JOIN_FORM = document.getElementById("join-form");
-      const JOIN_CARD = document.getElementById("join-card");
-      const MAIN_CARD = document.getElementById("main-card");
-      const LOGOUT_BTN = document.getElementById("logout-btn");
+      // Load identicon utility
+      const script = document.createElement('script');
+      script.src = 'utils/identicon.js';
+      document.head.appendChild(script);
 
-      function showJoin() {
-        JOIN_CARD.style.display = "";
-        MAIN_CARD.style.display = "none";
-      }
-      function showMain() {
-        JOIN_CARD.style.display = "none";
-        MAIN_CARD.style.display = "";
-      }
-
-      // Replace legacy beacons/status endpoints with Node route
-      function updateStatus(status) {
-        const leerling_id = localStorage.getItem("leerling_id");
-        const klas_id = localStorage.getItem("klas_id");
-        if (!leerling_id || !klas_id) return;
-        // best-effort send
-        try {
-          navigator.sendBeacon(
-            "/status-update",
-            new URLSearchParams({ status, leerling_id, klas_id })
-          );
-        } catch (e) {}
-      }
-
-      // Hook presence events + heartbeat + title updates
-      const _origTitle = document.title || "Leerling";
-      let _presenceHeartbeat = null;
-
-      function setTitleActive(isActive) {
-        if (isActive) document.title = "(Actief) " + _origTitle;
-        else document.title = "(Afwezig) " + _origTitle;
-      }
-
-      function sendStatus(status, useBeacon = false) {
-        try {
-          const leerling_id = localStorage.getItem("leerling_id");
-          const klas_id = localStorage.getItem("klas_id");
-          if (!leerling_id) return;
-          if (useBeacon && navigator.sendBeacon) {
-            try {
-              navigator.sendBeacon(
-                "/status-update",
-                new URLSearchParams({ status, leerling_id, klas_id })
-              );
-              return;
-            } catch (e) {
-              // fallback
-            }
-          }
-          // JSON POST for regular pings
-          fetch("/status-update", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              leerling_id: Number(leerling_id),
-              klas_id: Number(klas_id),
-              status,
-            }),
-          }).catch(() => {});
-        } catch (e) {}
-      }
-
-      function startPresenceHeartbeat() {
-        if (_presenceHeartbeat) return;
-        sendStatus("actief");
-        _presenceHeartbeat = setInterval(() => sendStatus("actief"), 20000);
-      }
-      function stopPresenceHeartbeat() {
-        if (!_presenceHeartbeat) return;
-        clearInterval(_presenceHeartbeat);
-        _presenceHeartbeat = null;
-      }
-
-      window.addEventListener("pagehide", function () {
-        sendStatus("closed", true);
-        stopPresenceHeartbeat();
-        setTitleActive(false);
-      });
-      document.addEventListener("visibilitychange", () => {
-        const isVisible = document.visibilityState === "visible";
-        sendStatus(isVisible ? "actief" : "non-actief");
-        setTitleActive(isVisible);
-        if (isVisible) startPresenceHeartbeat();
-        else stopPresenceHeartbeat();
-      });
-      window.addEventListener("blur", () => {
-        sendStatus("non-actief");
-        setTitleActive(false);
-        stopPresenceHeartbeat();
-      });
-      window.addEventListener("focus", () => {
-        sendStatus("actief");
-        setTitleActive(true);
-        startPresenceHeartbeat();
-      });
-
-      // Join flow
-      JOIN_FORM.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const form = e.target;
-        const code = (form.join_klascode.value || "").toUpperCase().trim();
-        const naam = (form.naam.value || "").trim();
-        const em = document.getElementById("error-message");
-        em.style.display = "none";
-        if (!code || !naam) {
-          em.textContent = "Klascode en naam verplicht";
-          em.style.display = "";
-          return;
+      class LearnerApp {
+        constructor() {
+          this.sessionId = null;
+          this.leerlingId = null;
+          this.currentQuestion = null;
+          this.score = 0;
+          this.totalQuestions = 0;
+          this.answeredQuestions = 0;
+          this.eventSource = null;
+          this.klasInfo = null;
+          this.init();
         }
-        try {
-          const res = await fetch("/leerling/join", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ klascode: code, naam }),
-          });
-          if (!res.ok) {
-            const j = await res.json().catch(() => ({}));
-            em.textContent = j.error || "Kon niet deelnemen";
-            em.style.display = "";
+
+        init() {
+          // Check if learner is logged in
+          const token = localStorage.getItem("learnerToken");
+          if (!token) {
+            // Redirect to login page with session ID if available
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session');
+            const loginUrl = sessionId ? `leerling_login.html?session=${sessionId}` : 'leerling_login.html';
+            window.location = loginUrl;
             return;
           }
-          const j = await res.json();
-          localStorage.setItem("leerling_id", String(j.leerling_id));
-          localStorage.setItem("klas_id", String(j.klas_id));
-          showMain();
-          updateAppState();
-          // start presence (heartbeat + immediate status)
-          sendStatus("actief");
-          startPresenceHeartbeat();
-        } catch (err) {
-          em.textContent = "Netwerkfout";
-          em.style.display = "";
-        }
-      });
 
-      LOGOUT_BTN.addEventListener("click", (e) => {
-        e.preventDefault();
-        localStorage.removeItem("leerling_id");
-        localStorage.removeItem("klas_id");
-        location.reload();
-      });
+          // Get session ID from URL
+          const urlParams = new URLSearchParams(window.location.search);
+          this.sessionId = urlParams.get('session');
+          
+          if (!this.sessionId) {
+            // Redirect to learner dashboard
+            window.location = 'leerling_dashboard.html';
+            return;
+          }
 
-      // Submit answer -> POST /sessies/:id/answer
-      async function submitAnswer() {
-        if (appState.isSubmitting) return;
-
-        const input = document.getElementById("answer-input");
-        const button = document.getElementById("submit-btn");
-        const answer = input.value.trim();
-
-        if (!answer) {
-          showMessage("Vul je antwoord in!", "error");
-          input.focus();
-          return;
-        }
-        if (!appState.currentSessionId || !appState.currentQuestionId) {
-          showMessage("Geen actieve vraag.", "error");
-          return;
+          this.token = token;
+          this.learnerData = JSON.parse(localStorage.getItem('learnerData') || '{}');
+          
+          // Join session
+          this.joinSession();
+          
+          // Setup SSE connection (no polling!)
+          this.setupSSE();
         }
 
-        appState.isSubmitting = true;
-        input.disabled = true;
-        button.disabled = true;
-        button.textContent = "Versturen...";
+        getOrCreateLearnerId() {
+          let learnerId = localStorage.getItem(`learner_${this.sessionId}`);
+          if (!learnerId) {
+            learnerId = 'learner_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem(`learner_${this.sessionId}`, learnerId);
+          }
+          return learnerId;
+        }
 
-        showMessage("Antwoord wordt verstuurd...", "info");
-
-        try {
-          const leerling_id = Number(localStorage.getItem("leerling_id"));
-          const res = await fetch(
-            `/sessies/${appState.currentSessionId}/answer`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
+        async joinSession() {
+          try {
+            const response = await fetch('/join-session', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
               body: JSON.stringify({
-                leerling_id,
-                vraag_id: appState.currentQuestionId,
-                antwoord: answer,
-              }),
+                sessionId: this.sessionId,
+                learnerId: this.learnerData?.id || null,
+                naam: this.learnerData?.naam || 'Leerling'
+              })
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({}));
+              throw new Error(errorData.error || 'Kon niet deelnemen aan sessie');
             }
-          );
-          const j = await res.json();
-          if (j.success) {
-            showMessage("Antwoord verstuurd!", "success");
-            showCompletedState(
-              document.getElementById("question-text").textContent
-            );
-            updateAppState();
-          } else {
-            showMessage(j.message || "Fout bij versturen", "error");
-            appState.isSubmitting = false;
-            input.disabled = false;
-            button.disabled = false;
-            button.textContent = "Verstuur Antwoord";
+
+            const data = await response.json();
+            this.klasInfo = data.klas_info;
+            this.learnerData.id = data.learner_id;
+            
+            // Save learner data
+            localStorage.setItem(`learner_${this.sessionId}`, data.learner_id);
+            
+            console.log('Joined session:', data);
+            this.showNotification('Succesvol deelgenomen aan sessie!', 'success');
+          } catch (error) {
+            console.error('Error joining session:', error);
+            this.showNotification(error.message, 'error');
           }
-        } catch (err) {
-          console.error("Submit error:", err);
-          showMessage("Netwerkfout. Probeer opnieuw.", "error");
-          appState.isSubmitting = false;
-          input.disabled = false;
-          button.disabled = false;
-          button.textContent = "Verstuur Antwoord";
-        }
-      }
-
-      // State management
-      const appState = {
-        currentSessionId: null,
-        currentQuestionId: null,
-        isSubmitting: false,
-        lastAnswerIds: new Set(),
-        connectionState: "disconnected",
-      };
-
-      // Show messages
-      function showMessage(text, type) {
-        console.log(`[${type}] ${text}`);
-        // You can show a toast/notification here if desired
-      }
-
-      // Update score display
-      function updateScore(score, answerCount) {
-        const scoreDisplay = document.getElementById("score-display");
-        const answerCountDisplay = document.getElementById("answer-count");
-        if (scoreDisplay) scoreDisplay.textContent = `${score} punten`;
-        if (answerCountDisplay)
-          answerCountDisplay.textContent = `${answerCount} beantwoord`;
-      }
-
-      function escapeHtml(s) {
-        if (!s) return "";
-        return String(s).replace(
-          /[&<>\"']/g,
-          (c) =>
-            ({
-              "&": "&amp;",
-              "<": "&lt;",
-              ">": "&gt;",
-              '"': "&quot;",
-              "'": "&#39;",
-            }[c])
-        );
-      }
-
-      // Update recent answers (colored badges + new-answer highlight)
-      function updateRecentAnswers(answers) {
-        const container = document.getElementById("recent-answers");
-        if (!container) return;
-        if (!answers || answers.length === 0) {
-          container.innerHTML = "<p>Nog geen antwoorden</p>";
-          appState.lastAnswerIds.clear();
-          return;
         }
 
-        const prevIds = new Set(appState.lastAnswerIds);
-        const ids = [];
+        setupSSE() {
+          // Use Server-Sent Events instead of polling
+          this.eventSource = new EventSource(`/sessies/${this.sessionId}/stream`);
+          
+          this.eventSource.onopen = () => {
+            console.log('SSE connection opened');
+          };
 
-        container.innerHTML = answers
-          .map((a) => {
-            const id =
-              a.id || a.resultaat_id || (a.rid ? a.rid : Math.random());
-            ids.push(id);
-            const question = escapeHtml(a.question || a.vraag || "Vraag");
-            const answer = escapeHtml(
-              a.answer || a.antwoord || a.gegeven_antwoord || "—"
-            );
-            const status = (a.status || "onbekend").toLowerCase();
-            const badgeClass =
-              status === "goed"
-                ? "goed"
-                : status === "typfout"
-                ? "typfout"
-                : status === "fout"
-                ? "fout"
-                : "onbekend";
-            const isNew = !prevIds.has(id);
-            const newClass = isNew ? " new" : "";
-            return `
-              <div class="answer-item${newClass}" data-id="${id}">
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-                  <div style="flex:1;min-width:0">
-                    <strong style="display:block">${question}</strong>
-                    <div style="color:#444;margin-top:6px;white-space:normal;overflow-wrap:break-word">${answer}</div>
-                    <div style="font-size:12px;color:var(--on-surface-variant);margin-top:6px">${escapeHtml(
-                      a.created_at || ""
-                    )}</div>
-                  </div>
-                  <div style="flex:0;margin-left:12px;white-space:nowrap">
-                    <span class="status-badge ${badgeClass}">${status}</span>
-                  </div>
-                </div>
-              </div>`;
-          })
-          .join("");
+          this.eventSource.onmessage = (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              this.handleSSEMessage(data);
+            } catch (error) {
+              console.error('Error parsing SSE message:', error);
+            }
+          };
 
-        // update tracked IDs
-        appState.lastAnswerIds = new Set(ids);
-
-        // remove 'new' highlight after a short time
-        setTimeout(() => {
-          const newEls = container.querySelectorAll(".answer-item.new");
-          newEls.forEach((el) => el.classList.remove("new"));
-        }, 2200);
-      }
-
-      // Show waiting state
-      function showWaitingState() {
-        const questionSection = document.getElementById("question-section");
-        const waitingSection = document.getElementById("waiting-section");
-        const completedSection = document.getElementById("completed-section");
-        if (questionSection) questionSection.style.display = "none";
-        if (waitingSection) waitingSection.style.display = "";
-        if (completedSection) completedSection.style.display = "none";
-      }
-
-      // Show question state
-      function showQuestionState(questionText) {
-        const questionSection = document.getElementById("question-section");
-        const waitingSection = document.getElementById("waiting-section");
-        const completedSection = document.getElementById("completed-section");
-        const questionTextDisplay = document.getElementById("question-text");
-        const answerInput = document.getElementById("answer-input");
-        const submitBtn = document.getElementById("submit-btn");
-
-        if (questionTextDisplay) questionTextDisplay.textContent = questionText;
-        if (answerInput) {
-          answerInput.value = "";
-          answerInput.disabled = false;
-        }
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Verstuur Antwoord";
-        }
-        if (questionSection) questionSection.style.display = "";
-        if (waitingSection) waitingSection.style.display = "none";
-        if (completedSection) completedSection.style.display = "none";
-      }
-
-      // Show completed state
-      function showCompletedState(questionText) {
-        const questionSection = document.getElementById("question-section");
-        const waitingSection = document.getElementById("waiting-section");
-        const completedSection = document.getElementById("completed-section");
-        const completedQuestionDisplay =
-          document.getElementById("completed-question");
-
-        if (completedQuestionDisplay)
-          completedQuestionDisplay.textContent = questionText;
-        if (questionSection) questionSection.style.display = "none";
-        if (waitingSection) waitingSection.style.display = "none";
-        if (completedSection) completedSection.style.display = "";
-      }
-
-      // Update state from server
-      async function updateAppState() {
-        const leerlingId = localStorage.getItem("leerling_id");
-        const klasId = localStorage.getItem("klas_id");
-        if (!leerlingId || !klasId) return;
-
-        try {
-          const res = await fetch(
-            `/student/state?leerling_id=${encodeURIComponent(
-              leerlingId
-            )}&klas_id=${encodeURIComponent(klasId)}`
-          );
-          if (!res.ok) throw new Error("state failed");
-          const data = await res.json();
-
-          if (data.session_ended) {
-            // clear local storage and show join
-            showMessage(
-              "Er is geen actieve sessie meer. Je bent uitgelogd.",
-              "info"
-            );
-            localStorage.removeItem("leerling_id");
-            localStorage.removeItem("klas_id");
+          this.eventSource.onerror = (error) => {
+            console.error('SSE error:', error);
+            // Try to reconnect after delay
             setTimeout(() => {
-              location.reload();
-            }, 1400);
+              if (this.eventSource.readyState === EventSource.CLOSED) {
+                this.setupSSE();
+              }
+            }, 5000);
+          };
+        }
+
+        handleSSEMessage(data) {
+          console.log('SSE message received:', data);
+
+          switch (data.type) {
+            case 'question':
+              this.showQuestion(data.question);
+              break;
+            case 'session_ended':
+              this.endSession();
+              break;
+            case 'score_update':
+              this.updateScore(data.score);
+              break;
+            default:
+              console.log('Unknown message type:', data.type);
+          }
+        }
+
+        showQuestion(question) {
+          this.currentQuestion = question;
+          this.totalQuestions++;
+          
+          const app = document.getElementById('app');
+          
+          // Check if it's an open question or multiple choice
+          const isOpenQuestion = !question.options || question.options.length === 0;
+          
+          app.innerHTML = `
+            <div class="question-card fade-in">
+              <h2 style="margin: 0 0 var(--space-md) 0; font-size: 1.5rem;">Vraag ${this.totalQuestions}</h2>
+              <p style="margin: 0; font-size: 1.1rem; line-height: 1.5;">${this.escapeHtml(question.text)}</p>
+              ${isOpenQuestion ? '<p class="helper" style="margin-top: var(--space-sm);">Dit is een open vraag. Type je antwoord hieronder.</p>' : ''}
+            </div>
+            
+            <div class="score-display">
+              <h3>Score</h3>
+              <div style="font-size: 2rem; font-weight: 700; color: var(--md-sys-color-primary);">
+                ${this.score} / ${this.answeredQuestions}
+              </div>
+            </div>
+            
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${(this.answeredQuestions / Math.max(this.totalQuestions, 1)) * 100}%"></div>
+            </div>
+            
+            <div class="answer-section">
+              ${isOpenQuestion ? this.renderOpenQuestion() : this.renderMultipleChoice(question)}
+            </div>
+          `;
+        }
+
+        renderOpenQuestion() {
+          return `
+            <div class="form-group">
+              <textarea 
+                id="openAnswer" 
+                placeholder="Type je antwoord hier..." 
+                rows="4" 
+                style="width: 100%; padding: var(--space-md); border: 2px solid var(--md-sys-color-outline); border-radius: var(--md-sys-shape-corner-medium); background-color: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface); font-size: 1rem; resize: vertical; font-family: inherit;"
+              ></textarea>
+              <button class="btn-primary" onclick="app.submitOpenAnswer()" style="margin-top: var(--space-md); width: 100%;">
+                Antwoord Insturen
+              </button>
+            </div>
+          `;
+        }
+
+        renderMultipleChoice(question) {
+          return `
+            <div class="answer-options">
+              ${question.options.map((option, index) => `
+                <div class="answer-option" data-index="${index}" onclick="app.selectAnswer(${index})">
+                  ${this.escapeHtml(option)}
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+
+        submitOpenAnswer() {
+          const answerText = document.getElementById('openAnswer').value.trim();
+          if (!answerText) {
+            this.showError('Voer een antwoord in');
             return;
           }
-          if (data.error) {
-            console.error("State error:", data.error);
-            return;
-          }
+          
+          // Submit the open answer
+          this.submitAnswer(answerText);
+        }
 
-          updateScore(data.score || 0, data.answer_count || 0);
-          updateRecentAnswers(data.recent_answers || []);
+        selectAnswer(index) {
+          if (!this.currentQuestion) return;
+          
+          const options = document.querySelectorAll('.answer-option');
+          options.forEach(opt => opt.classList.remove('selected'));
+          options[index].classList.add('selected');
+          
+          // Submit answer
+          this.submitAnswer(index);
+        }
 
-          const newQuestionId = data.current_question_id;
-          const hasQuestionChanged =
-            newQuestionId !== appState.currentQuestionId;
-          if (hasQuestionChanged) {
-            appState.currentQuestionId = newQuestionId;
-            appState.currentSessionId = data.session_id;
-            appState.isSubmitting = false;
-            // Start SSE stream on first session
-            if (data.session_id && !sseStream) {
-              startSSEStream(data.session_id);
+        async submitAnswer(answerIndex) {
+          try {
+            const response = await fetch(`/sessies/${this.sessionId}/answer`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.token}`
+              },
+              body: JSON.stringify({
+                leerlingId: this.learnerData.id,
+                answerIndex: answerIndex
+              })
+            });
+
+            if (!response.ok) {
+              throw new Error('Kon antwoord niet verzenden');
             }
-          }
 
-          if (!newQuestionId) showWaitingState();
-          else if (data.already_answered)
-            showCompletedState(data.question_text);
-          else showQuestionState(data.question_text);
-
-          if (newQuestionId && data.already_answered) {
-            const subtitle = document.getElementById("completed-subtitle");
-            const reveal = document.getElementById("reveal-answer");
-            const revealText = document.getElementById("reveal-answer-text");
-            if (data.all_answered && data.correct_answer) {
-              if (revealText) revealText.textContent = data.correct_answer;
-              if (reveal) reveal.style.display = "block";
-              if (subtitle)
-                subtitle.textContent =
-                  "Alle antwoorden binnen! Dit is het juiste antwoord:";
+            const result = await response.json();
+            this.answeredQuestions++;
+            
+            if (result.correct) {
+              this.score++;
+              this.showAnswerResult(answerIndex, true);
             } else {
-              if (reveal) reveal.style.display = "none";
-              if (subtitle)
-                subtitle.textContent =
-                  "Je hebt deze vraag beantwoord. Wacht op beoordeling...";
+              this.showAnswerResult(answerIndex, false);
+            }
+                
+            // Auto-advance to next question after delay
+            setTimeout(() => {
+              if (this.currentQuestion) {
+                this.currentQuestion = null;
+                // Clear current question display
+                const app = document.getElementById('app');
+                app.innerHTML = `
+                  <div class="waiting-state">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-secondary)); border-radius: var(--md-sys-shape-corner-extra-large); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-lg);">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23.15L12 24L16.38 23.15C19.77 20.68 22 16.5 22 12V7L12 2Z" fill="white" opacity="0.2"/>
+                        <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23.15L12 24L16.38 23.15C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                    <h2 style="color: var(--md-sys-color-on-surface); margin: 0 0 var(--space-sm) 0;">Wachten op volgende vraag...</h2>
+                    <p class="helper">Je docent zal binnenkort een nieuwe vraag sturen</p>
+                  </div>
+                `;
+              }
+            }, 2000);
+          } catch (error) {
+            console.error('Error submitting answer:', error);
+            this.showError('Kon antwoord niet verzenden');
+          }
+        }
+
+        showAnswerResult(answerIndex, correct) {
+          const options = document.querySelectorAll('.answer-option');
+          const selectedOption = options[answerIndex];
+          
+          if (correct) {
+            selectedOption.classList.add('correct');
+          } else {
+            selectedOption.classList.add('incorrect');
+            // Show correct answer
+            if (this.currentQuestion.correctAnswer !== undefined) {
+              options[this.currentQuestion.correctAnswer].classList.add('correct');
             }
           }
-        } catch (err) {
-          console.error("Update error:", err);
+          
+          // Disable all options
+          options.forEach(opt => opt.style.pointerEvents = 'none');
         }
-      }
 
-      // SSE stream control
-      let sseStream = null;
-
-      function setConnectionState(state) {
-        appState.connectionState = state;
-        const el = document.getElementById("connection-indicator");
-        if (!el) return;
-        el.classList.remove("connected", "polling", "disconnected");
-        if (state === "connected") {
-          el.classList.add("connected");
-          el.innerHTML = '<span class="dot"></span>Live';
-        } else if (state === "polling") {
-          el.classList.add("polling");
-          el.innerHTML = '<span class="dot"></span>Polling';
-        } else {
-          el.classList.add("disconnected");
-          el.innerHTML = '<span class="dot"></span>Offline';
-        }
-      }
-      // initialize UI state
-      setConnectionState(appState.connectionState);
-
-      function startSSEStream(sessionId) {
-        if (sseStream) return;
-        const token = localStorage.getItem("token");
-        const url = token
-          ? `/sessies/${sessionId}/stream?token=${encodeURIComponent(token)}`
-          : `/sessies/${sessionId}/stream`;
-        sseStream = new EventSource(url);
-
-        sseStream.addEventListener("open", () => {
-          console.log("SSE connected");
-          setConnectionState("connected");
-        });
-
-        // Listen for both teacher 'session' events and lightweight 'update' events
-        sseStream.addEventListener("session", (e) => {
-          try {
-            const data = JSON.parse(e.data);
-            // teacher clients receive full payload; student clients can refetch
-            updateAppState();
-          } catch (err) {
-            console.error("SSE session parse error:", err);
+        updateScore(newScore) {
+          this.score = newScore;
+          
+          // Update score display if visible
+          const scoreDisplay = document.querySelector('.score-display div');
+          if (scoreDisplay) {
+            scoreDisplay.textContent = `${this.score} / ${this.answeredQuestions}`;
           }
-        });
-
-        sseStream.addEventListener("update", (e) => {
-          try {
-            // update event triggers a fetch for current state
-            updateAppState();
-          } catch (err) {
-            console.error("SSE update parse error:", err);
-          }
-        });
-
-        sseStream.addEventListener("error", (e) => {
-          console.error("SSE error:", e);
-          setConnectionState("disconnected");
-          // try to reconnect after a short delay if closed
-          if (sseStream.readyState === EventSource.CLOSED) {
-            console.log("SSE stream closed, attempting reconnect in 3s");
-            sseStream = null;
-            setTimeout(() => startSSEStream(sessionId), 3000);
-          }
-        });
-      }
-
-      function stopSSEStream() {
-        if (sseStream) {
-          sseStream.close();
-          sseStream = null;
-        }
-        setConnectionState("disconnected");
-      }
-
-      // Initialize on page load
-      document.addEventListener("DOMContentLoaded", () => {
-        const leerlingId = localStorage.getItem("leerling_id");
-        const klasId = localStorage.getItem("klas_id");
-        if (leerlingId && klasId) {
-          showMain();
-          updateStatus("actief");
-          updateAppState();
-          // SSE stream will be started after getting session ID from first update
-        } else {
-          showJoin();
         }
 
-        // Handle Enter key in input
-        document
-          .getElementById("answer-input")
-          .addEventListener("keypress", (e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              submitAnswer();
-            }
-          });
-        // Submit button click
-        document.getElementById("submit-btn").addEventListener("click", (e) => {
-          e.preventDefault();
-          submitAnswer();
-        });
-      });
+        endSession() {
+          if (this.eventSource) {
+            this.eventSource.close();
+          }
+          
+          const app = document.getElementById('app');
+          app.innerHTML = `
+            <div class="session-ended fade-in">
+              <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--md-sys-color-tertiary), var(--md-sys-color-primary)); border-radius: var(--md-sys-shape-corner-extra-large); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-lg);">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 11L11 14L15 8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h2 style="color: var(--md-sys-color-on-surface); margin: 0 0 var(--space-md) 0;">Sessie Beëindigd</h2>
+              <div style="font-size: 3rem; font-weight: 700; color: var(--md-sys-color-primary); margin: var(--space-lg) 0;">
+                ${this.score} / ${this.answeredQuestions}
+              </div>
+              <p style="color: var(--md-sys-color-on-surface-variant); margin: 0;">
+                ${this.answeredQuestions > 0 ? Math.round((this.score / this.answeredQuestions) * 100) : 0}% correct
+              </p>
+              <div style="margin-top: var(--space-xl);">
+                <button class="btn-primary" onclick="window.close()">
+                  Sluit Venster
+                </button>
+              </div>
+            </div>
+          `;
+        }
 
-      // Expose submit for inline onclick
-      window.submitAnswer = submitAnswer;
+        showError(message) {
+          const app = document.getElementById('app');
+          app.innerHTML = `
+            <div class="notification error" style="margin: var(--space-lg);">
+              ${message}
+            </div>
+          `;
+        }
+
+        showNotification(message, type = 'info') {
+          const notification = document.createElement('div');
+          notification.className = `notification ${type}`;
+          notification.textContent = message;
+          notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--md-sys-shape-corner-medium);
+            color: var(--md-sys-color-on-${type === 'success' ? 'tertiary' : 'surface'});
+            background-color: var(--md-sys-color-${type === 'success' ? 'tertiary' : 'surface'});
+            border: 1px solid var(--md-sys-color-outline);
+            box-shadow: var(--md-sys-elevation-level2);
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+          `;
+          
+          document.body.appendChild(notification);
+          
+          setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => notification.remove(), 300);
+          }, 3000);
+        }
+
+        escapeHtml(text) {
+          if (!text) return '';
+          return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        }
+      }
+
+      // Initialize app
+      const app = new LearnerApp();
     </script>
   </body>
 </html>

@@ -2,60 +2,132 @@
 <html lang="nl">
   <head>
     <meta charset="utf-8" />
-    <title>Login</title>
-    <link rel="stylesheet" href="assets/css/styles.css" />
+    <title>Login - Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/material3.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      @supports (view-transition-name: none) {
+        html {
+          view-transition-name: root;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div class="container card" style="max-width: 420px; margin: 40px auto">
-      <h2>Docent inloggen</h2>
-      <div id="error" style="color: red"></div>
-      <form id="loginForm">
-        <label>Email</label>
-        <input name="email" type="email" id="email" required />
+    <div class="container">
+      <main class="main-content" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+        <section class="card fade-in" style="max-width: 420px; width: 100%;">
+          <div class="card-header" style="text-align: center; margin-bottom: var(--space-xl);">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-secondary)); border-radius: var(--md-sys-shape-corner-extra-large); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-lg); animation: float 3s ease-in-out infinite;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23.15L12 24L16.38 23.15C19.77 20.68 22 16.5 22 12V7L12 2Z" fill="white" opacity="0.2"/>
+                <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23.15L12 24L16.38 23.15C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9 12L11 14L15 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h1 style="margin: 0; color: var(--md-sys-color-on-surface); font-size: 2rem; font-weight: 700;">Docent Inloggen</h1>
+            <p class="helper" style="margin: 0;">Welkom terug bij Overhoorder</p>
+          </div>
 
-        <label>Wachtwoord</label>
-        <input name="wachtwoord" type="password" id="password" required />
+          <form id="loginForm" class="form">
+            <div id="error" class="notification error" style="display: none; margin-bottom: var(--space-md);"></div>
+            
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input name="email" type="email" id="email" required placeholder="voer@email.nl" />
+            </div>
 
-        <div style="margin-top: 12px">
-          <button class="btn-primary" type="submit">Inloggen</button>
-        </div>
-      </form>
-      <p class="helper">
-        Wachtwoord vergeten?
-        <a href="wachtwoord_vergeten.html">Herstel wachtwoord</a>
-      </p>
-      <p class="helper">
-        Nog geen account? <a href="register.html">Registreer</a>
-      </p>
+            <div class="form-group">
+              <label for="password">Wachtwoord</label>
+              <input name="wachtwoord" type="password" id="password" required placeholder="Voer je wachtwoord in..." />
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: var(--space-lg);">
+              <span>Inloggen</span>
+            </button>
+          </form>
+
+          <div style="text-align: center; margin-top: var(--space-xl);">
+            <p class="helper" style="margin: 0;">
+              Wachtwoord vergeten?
+              <a href="wachtwoord_vergeten.html" style="color: var(--md-sys-color-primary); font-weight: 500;">Herstel wachtwoord</a>
+            </p>
+            <p class="helper" style="margin: var(--space-sm) 0 0;">
+              Nog geen account? <a href="register.html" style="color: var(--md-sys-color-primary); font-weight: 500;">Registreer</a>
+            </p>
+          </div>
+        </section>
+      </main>
     </div>
+
     <script>
-      document
-        .getElementById("loginForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const errorEl = document.getElementById("error");
-          errorEl.textContent = "";
-          const email = document.getElementById("email").value.trim();
-          const wachtwoord = document.getElementById("password").value;
-          try {
-            const res = await fetch("/login", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email, wachtwoord }),
-            });
-            const data = await res.json();
-            if (!res.ok) {
-              errorEl.textContent = data.error || "Login failed";
-              return;
-            }
-            // Store token and go to dashboard
-            if (data.token) localStorage.setItem("token", data.token);
-            window.location.href = "/dashboard.html";
-          } catch (err) {
-            errorEl.textContent = "Netwerkfout";
+      // Load identicon utility
+      const script = document.createElement('script');
+      script.src = 'utils/identicon.js';
+      document.head.appendChild(script);
+
+      // Login form handler
+      document.getElementById("loginForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalContent = submitBtn.innerHTML;
+        const errorDiv = document.getElementById("error");
+        
+        submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416"/></svg><span>Inloggen...</span>`;
+        submitBtn.disabled = true;
+        errorDiv.style.display = 'none';
+
+        const formData = new FormData(e.target);
+        const email = formData.get("email").trim();
+        const wachtwoord = formData.get("wachtwoord");
+
+        try {
+          const res = await fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, wachtwoord }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error || "Inloggen mislukt");
           }
-        });
+
+          // Store token
+          localStorage.setItem("token", data.token);
+          
+          // Navigate with view transition if supported
+          if (document.startViewTransition) {
+            document.startViewTransition(() => {
+              window.location = "dashboard.html";
+            });
+          } else {
+            window.location = "dashboard.html";
+          }
+        } catch (err) {
+          errorDiv.textContent = err.message;
+          errorDiv.style.display = 'block';
+          submitBtn.innerHTML = originalContent;
+          submitBtn.disabled = false;
+        }
+      });
+
+      // Show notification helper
+      function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.style.animation = 'slideOutRight 0.3s ease-out';
+          setTimeout(() => notification.remove(), 300);
+        }, 3000);
+      }
     </script>
   </body>
 </html>

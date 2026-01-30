@@ -2,107 +2,444 @@
 <html lang="nl">
   <head>
     <meta charset="utf-8" />
-    <title>Start overhoring</title>
-    <link rel="stylesheet" href="assets/css/styles.css" />
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="https://overhoren.ivenboxem.nl/assets/img/logo2.png"
-    />
+    <title>Start Overhoring - Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/material3.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      @supports (view-transition-name: none) {
+        html {
+          view-transition-name: root;
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="container">
-      <a href="dashboard.html" class="btn-text">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="24px"
-          viewBox="0 -960 960 960"
-          width="24px"
-          fill="var(--svg-icons)"
-        >
-          <path
-            d="m368-417 202 202-90 89-354-354 354-354 90 89-202 202h466v126H368Z"
-          />
-        </svg>
-      </a>
-      <h1 class="app-title">Start overhoring</h1>
-      <p class="helper" id="klas-naam"></p>
+      <header class="header">
+        <div class="header-content">
+          <button class="btn-secondary" onclick="window.location='dashboard.html'">
+            <svg width="20" height="20" viewBox="0 -960 960 960" fill="currentColor" style="margin-right: var(--space-sm);">
+              <path d="m368-417 202 202-90 89-354-354 354-354 90 89-202 202h466v126H368Z"/>
+            </svg>
+            Terug
+          </button>
+          <div class="chip">Overhoorder • Docent</div>
+        </div>
+      </header>
 
-      <div class="card" id="main-card">
-        <p class="helper">Laden...</p>
-      </div>
+      <main class="main-content">
+        <h1 class="page-title">Start Overhoring</h1>
+        <p class="helper" id="klas-naam" style="font-size: 1.1rem; margin-bottom: var(--space-xl);"></p>
+
+        <div class="dashboard-grid">
+          <section class="card fade-in">
+            <div class="card-header">
+              <h3>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                  <path d="M9 11H15V21H9V11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M3 21V7C3 5.89543 3.89543 5 5 5H19C20.1046 5 21 5.89543 21 7V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 3V5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Kies Vragenlijst
+              </h3>
+            </div>
+            <div id="vragenlijsten" class="content-list"></div>
+          </section>
+
+          <section class="card fade-in" style="animation-delay: 0.1s;">
+            <div class="card-header">
+              <h3>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                  <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Sessie Instellingen
+              </h3>
+            </div>
+            <form id="sessionForm" class="form">
+              <div class="form-group">
+                <label for="vraag_tijd">Tijd per vraag (seconden)</label>
+                <input type="number" id="vraag_tijd" name="vraag_tijd" min="10" max="300" value="30" />
+                <p class="helper">Tijd die leerlingen hebben per vraag</p>
+              </div>
+              <div class="form-group">
+                <label for="willekeurig">Vragen volgorde</label>
+                <select id="willekeurig" name="willekeurig">
+                  <option value="true">Willekeurig</option>
+                  <option value="false">Originele volgorde</option>
+                </select>
+                <p class="helper">Kies de volgorde van de vragen</p>
+              </div>
+            </form>
+          </section>
+
+          <section class="card fade-in" style="animation-delay: 0.2s;">
+            <div class="card-header">
+              <h3>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Start Sessie
+              </h3>
+            </div>
+            <div id="startSection" style="text-align: center;">
+              <button id="startBtn" class="btn-primary" disabled style="font-size: 1.1rem; padding: var(--space-lg) var(--space-xl);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: var(--space-sm);">
+                  <polygon points="5,3 19,12 5,21" fill="currentColor"/>
+                </svg>
+                Start Overhoring
+              </button>
+              <p class="helper" style="margin-top: var(--space-md);">Selecteer eerst een vragenlijst</p>
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
-    <script>
-      const params = new URLSearchParams(window.location.search);
-      const klasId = params.get("klas");
-      if (!klasId) {
-        alert("Geen klas gekozen");
-        window.location = "dashboard.html";
-      }
-      const token = localStorage.getItem("token");
-      if (!token) {
-        window.location =
-          "login.html?redirecturi=" +
-          encodeURIComponent("start_sessie.html?klas=" + klasId);
-      }
-      const headers = {
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json",
-      };
 
-      async function load() {
-        const res = await fetch("/klas/" + klasId, { headers });
-        if (!res.ok) {
-          alert("Fout bij laden klas.");
-          window.location = "dashboard.html";
-          return;
+    <script>
+      // Load identicon utility
+      const script = document.createElement('script');
+      script.src = 'utils/identicon.js';
+      document.head.appendChild(script);
+
+      class SessionManager {
+        constructor() {
+          this.klasId = null;
+          this.klasNaam = null;
+          this.selectedVragenlijst = null;
+          this.token = localStorage.getItem("token");
+          this.init();
         }
-        const data = await res.json();
-        document.getElementById("klas-naam").innerHTML =
-          "Klas: <strong>" + (data.klas.naam || "") + "</strong>";
-        const card = document.getElementById("main-card");
-        if (!data.vragenlijsten || data.vragenlijsten.length === 0) {
-          card.innerHTML = `<div class="card"><p class="helper">Deze klas heeft nog geen vragenlijsten. Maak eerst een vragenlijst aan via <strong>Beheer klas</strong>.</p><a class="btn-primary" href="manage_klas.html?klas=${klasId}">Ga naar klasbeheer</a></div>`;
-          return;
-        }
-        const options = data.vragenlijsten
-          .map((v) => `<option value="${v.id}">${v.naam}</option>`)
-          .join("");
-        card.innerHTML = `
-    <h3>Kies een vragenlijst</h3>
-    <form id="start-form">
-      <label>Vragenlijst</label>
-      <select name="vragenlijst_id" required>
-        <option value="">Selecteer een vragenlijst...</option>
-        ${options}
-      </select>
-      <div style="margin-top:12px;">
-        <button class="btn-primary" type="submit">Start overhoring</button>
-      </div>
-    </form>
-  `;
-        document.getElementById("start-form").onsubmit = async (e) => {
-          e.preventDefault();
-          const vId = e.target.vragenlijst_id.value;
-          if (!vId) return;
-          // Use GET + token in query to avoid preflight and ensure browser can call it without CORS preflight
-          const token = localStorage.getItem("token");
-          const q = new URLSearchParams({
-            klas_id: klasId,
-            vragenlijst_id: vId,
-            token,
-          });
-          const r = await fetch("/start-sessie?" + q.toString());
-          if (!r.ok) {
-            const err = await r.json().catch(() => ({}));
-            alert("Fout bij starten sessie: " + (err.error || r.status));
+
+        init() {
+          if (!this.token) {
+            window.location = "login.html";
             return;
           }
-          const data = await r.json();
-          window.location = "vraag_handler.html?sessie=" + data.id;
-        };
+
+          // Get klas ID from URL
+          const urlParams = new URLSearchParams(window.location.search);
+          this.klasId = urlParams.get('klas');
+          
+          if (!this.klasId) {
+            this.showError('Geen klas ID gevonden');
+            return;
+          }
+
+          this.loadKlasInfo();
+          this.loadVragenlijsten();
+          this.setupEventListeners();
+        }
+
+        async loadKlasInfo() {
+          try {
+            const response = await fetch(`/klas/${this.klasId}`, {
+              headers: { Authorization: `Bearer ${this.token}` }
+            });
+            
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error('Response error:', errorText);
+              throw new Error('Kon klas informatie niet laden');
+            }
+
+            const klas = await response.json();
+            
+            // Extract klas from the response
+            const klasData = klas.klas || klas;
+            
+            this.klasNaam = klasData.naam;
+            document.getElementById('klas-naam').textContent = `Klas: ${klasData.naam || 'Onbekend'} (Code: ${klasData.klascode || 'N/A'})`;
+          } catch (error) {
+            console.error('Error loading klas info:', error);
+            document.getElementById('klas-naam').textContent = 'Klas: Laden mislukt';
+            this.showError('Kon klas informatie niet laden');
+          }
+        }
+
+        async loadVragenlijsten() {
+          try {
+            console.log('Loading vragenlijsten for klas:', this.klasId);
+            
+            // Load klas-specific vragenlijsten
+            const response = await fetch(`/klas/${this.klasId}`, {
+              headers: { Authorization: `Bearer ${this.token}` }
+            });
+
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error('Vragenlijsten error:', errorText);
+              throw new Error('Kon vragenlijsten niet laden');
+            }
+
+            const klasData = await response.json();
+            console.log('Klas data received:', klasData);
+            
+            // Extract vragenlijsten from the response
+            const vragenlijsten = klasData.vragenlijsten || [];
+            console.log('Klas-specifieke vragenlijsten:', vragenlijsten);
+            
+            // Also load bibliotheek vragenlijsten as backup
+            try {
+              const dashboardResponse = await fetch('/dashboard-data', {
+                headers: { Authorization: `Bearer ${this.token}` }
+              });
+              
+              if (dashboardResponse.ok) {
+                const dashboardData = await dashboardResponse.json();
+                console.log('Dashboard data:', dashboardData);
+                const biblioLijsten = dashboardData.biblio_lijsten || [];
+                console.log('Bibliotheek vragenlijsten:', biblioLijsten);
+                
+                // Combine both lists, prioritize klas-specific ones
+                const allVragenlijsten = [
+                  ...vragenlijsten,
+                  ...biblioLijsten
+                ];
+                
+                console.log('Alle vragenlijsten:', allVragenlijsten);
+                this.renderVragenlijsten(allVragenlijsten);
+              } else {
+                console.log('Dashboard data failed, using only klas vragenlijsten');
+                this.renderVragenlijsten(vragenlijsten);
+              }
+            } catch (dashboardError) {
+              console.error('Dashboard error:', dashboardError);
+              console.log('Using only klas vragenlijsten due to dashboard error');
+              this.renderVragenlijsten(vragenlijsten);
+            }
+          } catch (error) {
+            console.error('Error loading vragenlijsten:', error);
+            this.showError('Kon vragenlijsten niet laden');
+          }
+        }
+
+        renderVragenlijsten(vragenlijsten) {
+          const container = document.getElementById('vragenlijsten');
+          
+          if (!vragenlijsten || vragenlijsten.length === 0) {
+            container.innerHTML = `
+              <div style="text-align: center; padding: var(--space-xl);">
+                <p class="helper">Geen vragenlijsten beschikbaar.</p>
+                <button class="btn-primary" onclick="sessionManager.createTestVragenlijst()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: var(--space-sm);">
+                    <path d="M12 4v16m8-8H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Maak Test Vragenlijst
+                </button>
+                <p class="helper" style="margin-top: var(--space-md);">Of maak vragenlijsten aan in het dashboard.</p>
+              </div>
+            `;
+            return;
+          }
+
+          container.innerHTML = '';
+          const ul = document.createElement('ul');
+          
+          vragenlijsten.forEach((lijst, index) => {
+            const li = document.createElement('li');
+            li.style.animationDelay = `${index * 0.05}s`;
+            li.className = 'slide-in';
+            
+            // Handle both bibliotheek and klas-specific vragenlijsten
+            const titel = lijst.titel || lijst.naam || 'Naamloze vragenlijst';
+            const id = lijst.id;
+            const vraagCount = lijst.vragen_count || lijst.vragen || 0;
+            
+            li.innerHTML = `
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <strong style="color: var(--md-sys-color-on-surface);">${this.escapeHtml(titel)}</strong>
+                  <div class="helper">${vraagCount} vragen</div>
+                  ${lijst.klas_id ? '<div class="helper" style="color: var(--md-sys-color-tertiary);">Klas-specifiek</div>' : '<div class="helper" style="color: var(--md-sys-color-secondary);">Bibliotheek</div>'}
+                </div>
+                <button class="btn-secondary" onclick="sessionManager.selectVragenlijst(${id})">
+                  Selecteren
+                </button>
+              </div>
+            `;
+            
+            ul.appendChild(li);
+          });
+          
+          container.appendChild(ul);
+        }
+
+        async createTestVragenlijst() {
+          try {
+            const response = await fetch('/create-test-vragenlijst', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.token}`
+              },
+              body: JSON.stringify({
+                klas_id: this.klasId,
+                naam: 'Test Vragenlijst - Gemaakt op ' + new Date().toLocaleString('nl-NL')
+              })
+            });
+
+            if (!response.ok) {
+              throw new Error('Kon test vragenlijst niet aanmaken');
+            }
+
+            const result = await response.json();
+            console.log('Test vragenlijst aangemaakt:', result);
+            
+            // Reload vragenlijsten
+            this.loadVragenlijsten();
+            
+            this.showSuccess('Test vragenlijst met 3 vragen aangemaakt!');
+          } catch (error) {
+            console.error('Error creating test vragenlijst:', error);
+            this.showError('Kon test vragenlijst niet aanmaken');
+          }
+        }
+
+        selectVragenlijst(vragenlijstId) {
+          this.selectedVragenlijst = vragenlijstId;
+          
+          // Update UI
+          document.getElementById('startBtn').disabled = false;
+          document.querySelector('#startSection .helper').textContent = 'Klaar om te starten!';
+          
+          // Highlight selected
+          document.querySelectorAll('#vragenlijsten button').forEach(btn => {
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-secondary');
+          });
+          
+          // Find and highlight the clicked button
+          event.target.classList.remove('btn-secondary');
+          event.target.classList.add('btn-primary');
+        }
+
+        setupEventListeners() {
+          document.getElementById('startBtn').addEventListener('click', () => {
+            this.startSession();
+          });
+        }
+
+        async startSession() {
+          if (!this.selectedVragenlijst) {
+            this.showError('Selecteer eerst een vragenlijst');
+            return;
+          }
+
+          // Validate token before starting session
+          try {
+            const validateResponse = await fetch('/me', {
+              headers: {
+                'Authorization': `Bearer ${this.token}`
+              }
+            });
+            
+            if (!validateResponse.ok) {
+              // Token is invalid, redirect to login
+              localStorage.removeItem('token');
+              window.location = 'login.html';
+              return;
+            }
+          } catch (error) {
+            console.error('Token validation failed:', error);
+            localStorage.removeItem('token');
+            window.location = 'login.html';
+            return;
+          }
+
+          const startBtn = document.getElementById('startBtn');
+          const originalContent = startBtn.innerHTML;
+          
+          startBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416"/></svg><span>Starten...</span>`;
+          startBtn.disabled = true;
+
+          try {
+            const formData = new FormData(document.getElementById('sessionForm'));
+            const settings = {
+              vraag_tijd: parseInt(formData.get('vraag_tijd')),
+              willekeurig: formData.get('willekeurig') === 'true'
+            };
+
+            const response = await fetch('/sessies', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.token}`
+              },
+              body: JSON.stringify({
+                klas_id: this.klasId,
+                vragenlijst_id: this.selectedVragenlijst,
+                settings: settings
+              })
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({}));
+              throw new Error(errorData.error || 'Kon sessie niet starten');
+            }
+
+            const session = await response.json();
+            
+            // Open session in new window
+            const sessionUrl = `leerling.html?session=${session.id}`;
+            window.open(sessionUrl, '_blank', 'width=800,height=600');
+            
+            // Navigate to session management
+            if (document.startViewTransition) {
+              document.startViewTransition(() => {
+                window.location = `vraag_handler.html?session=${session.id}`;
+              });
+            } else {
+              window.location = `vraag_handler.html?session=${session.id}`;
+            }
+          } catch (error) {
+            console.error('Error starting session:', error);
+            this.showError(error.message);
+            startBtn.innerHTML = originalContent;
+            startBtn.disabled = false;
+          }
+        }
+
+        showError(message) {
+          const notification = document.createElement('div');
+          notification.className = 'notification error';
+          notification.textContent = message;
+          document.body.appendChild(notification);
+          
+          setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => notification.remove(), 300);
+          }, 3000);
+        }
+
+        showSuccess(message) {
+          const notification = document.createElement('div');
+          notification.className = 'notification success';
+          notification.textContent = message;
+          document.body.appendChild(notification);
+          
+          setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => notification.remove(), 300);
+          }, 3000);
+        }
+
+        escapeHtml(text) {
+          if (!text) return '';
+          return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        }
       }
-      window.onload = load;
+
+      // Initialize session manager
+      const sessionManager = new SessionManager();
     </script>
   </body>
 </html>

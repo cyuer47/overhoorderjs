@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Admin Licenties - Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/material3.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      @supports (view-transition-name: none) {
+        html {
+          view-transition-name: root;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="header-content">
+          <div class="chip">Overhoorder • Admin</div>
+          <div class="profile-container">
+            <button class="profile-btn" onclick="toggleProfileMenu()">
+              <img id="avatar" src="" alt="Avatar" class="profile-avatar" />
+              <span id="profile-name" class="profile-name"></span>
+              <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="currentColor">
+                <path d="M7 10l5 5 5-5H7z" />
+              </svg>
+            </button>
+            <div class="profile-menu">
+              <a href="profile.html">Mijn profiel</a>
+              <a href="settings.html">Instellingen</a>
+              <a href="dashboard.html">Dashboard</a>
+              <a href="#" id="logout-link" class="logout-btn">Uitloggen</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <h1 class="page-title">Admin Licenties</h1>
+
+        <div class="dashboard-grid">
+          <section class="card fade-in">
+            <div class="card-header">
+              <h3>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                  <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23.15L12 24L16.38 23.15C19.77 20.68 22 16.5 22 12V7L12 2Z" fill="currentColor" opacity="0.2"/>
+                  <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23.15L12 24L16.38 23.15C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Nieuwe Licentie Aanmaken
+              </h3>
+            </div>
+            <form id="createLicenseForm" class="form">
+              <div class="form-group">
+                <label for="aantal">Aantal licenties</label>
+                <input type="number" name="aantal" id="aantal" required min="1" max="50" placeholder="Voer aantal licenties in..." />
+              </div>
+              <div class="form-group">
+                <label for="max_leerlingen">Maximaal aantal leerlingen</label>
+                <input type="number" name="max_leerlingen" id="max_leerlingen" required min="1" placeholder="bv. 30" />
+              </div>
+              <div class="form-group">
+                <label for="vervalt_op">Vervaldatum (optioneel)</label>
+                <input type="date" name="vervalt_op" id="vervalt_op" />
+              </div>
+              <button type="submit" class="btn-primary">
+                <span>Licenties Aanmaken</span>
+              </button>
+            </form>
+          </section>
+
+          <section class="card fade-in" style="animation-delay: 0.1s;">
+            <div class="card-header">
+              <h3>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                  <path d="M9 11H15V21H9V11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M3 21V7C3 5.89543 3.89543 5 5 5H19C20.1046 5 21 5.89543 21 7V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 3V5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Licentiecodes
+              </h3>
+            </div>
+            <div id="licensesList" class="content-list"></div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script src="admin_licenties.js"></script>
+  </body>
+</html>

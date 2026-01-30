@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Leerling Login - Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/material3.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      @supports (view-transition-name: none) {
+        html {
+          view-transition-name: root;
+        }
+      }
+      
+      /* Custom styles for login page */
+      .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-secondary));
+        padding: var(--space-lg);
+      }
+      
+      .login-card {
+        background-color: var(--md-sys-color-surface-container);
+        border-radius: var(--md-sys-shape-corner-extra-large);
+        box-shadow: var(--md-sys-elevation-level3);
+        width: 100%;
+        max-width: 480px;
+        overflow: hidden;
+        animation: slideInUp 0.5s ease-out;
+      }
+      
+      .login-header {
+        background: linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-secondary));
+        color: var(--md-sys-color-on-primary);
+        padding: var(--space-xl);
+        text-align: center;
+      }
+      
+      .login-header h2 {
+        margin: var(--space-md) 0 var(--space-sm) 0;
+        font-size: 1.5rem;
+        font-weight: 500;
+      }
+      
+      .login-tabs {
+        display: flex;
+        background-color: var(--md-sys-color-surface-container-high);
+        border-bottom: 1px solid var(--md-sys-color-outline);
+      }
+      
+      .login-tab {
+        flex: 1;
+        padding: var(--space-md);
+        background: none;
+        border: none;
+        color: var(--md-sys-color-on-surface-variant);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-emphasized);
+        border-bottom: 2px solid transparent;
+      }
+      
+      .login-tab:hover {
+        background-color: var(--md-sys-color-surface-container-highest);
+      }
+      
+      .login-tab.active {
+        color: var(--md-sys-color-primary);
+        border-bottom-color: var(--md-sys-color-primary);
+        background-color: var(--md-sys-color-surface-container);
+      }
+      
+      .form-section {
+        padding: var(--space-xl);
+        display: none;
+      }
+      
+      .form-section.active {
+        display: block;
+        animation: fadeIn 0.3s ease-out;
+      }
+      
+      .form-group {
+        margin-bottom: var(--space-lg);
+      }
+      
+      .form-group label {
+        display: block;
+        margin-bottom: var(--space-xs);
+        color: var(--md-sys-color-on-surface);
+        font-weight: 500;
+        font-size: 0.875rem;
+      }
+      
+      .form-group input {
+        width: 100%;
+        padding: var(--space-md);
+        border: 1px solid var(--md-sys-color-outline);
+        border-radius: var(--md-sys-shape-corner-small);
+        background-color: var(--md-sys-color-surface-container-high) !important;
+        color: var(--md-sys-color-on-surface);
+        font-size: 1rem;
+        transition: all var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-emphasized);
+      }
+      
+      .form-group input:focus {
+        outline: none;
+        border-color: var(--md-sys-color-primary);
+        border-width: 2px;
+        background-color: var(--md-sys-color-surface-container-highest) !important;
+        box-shadow: 0 0 0 4px var(--md-sys-color-primary-container);
+      }
+      
+      .form-group input:hover {
+        background-color: var(--md-sys-color-surface-container-highest) !important;
+      }
+      
+      .login-footer {
+        padding: var(--space-lg);
+        text-align: center;
+        background-color: var(--md-sys-color-surface-container-high);
+        border-top: 1px solid var(--md-sys-color-outline);
+      }
+      
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      
+      .notification {
+        position: fixed;
+        top: var(--space-lg);
+        right: var(--space-lg);
+        padding: var(--space-md) var(--space-lg);
+        border-radius: var(--md-sys-shape-corner-medium);
+        color: var(--md-sys-color-on-primary);
+        font-weight: 500;
+        z-index: var(--z-modal);
+        animation: slideInRight 0.3s ease-out;
+      }
+      
+      .notification.success {
+        background-color: var(--md-sys-color-tertiary);
+      }
+      
+      .notification.error {
+        background-color: var(--md-sys-color-error);
+      }
+      
+      .notification.info {
+        background-color: var(--md-sys-color-primary);
+      }
+      
+      .notification.warning {
+        background-color: var(--md-sys-color-secondary);
+      }
+      
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(100px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      
+      @keyframes slideOutRight {
+        from {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateX(100px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <div style="width: 80px; height: 80px; background: rgba(255, 255, 255, 0.2); border-radius: var(--md-sys-shape-corner-extra-large); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md);">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="9" cy="7" r="4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h2>Leerling Inloggen</h2>
+          <p class="helper">Neem deel aan je klas en start met overhoren</p>
+        </div>
+
+        <div class="login-tabs">
+          <button class="login-tab active" onclick="switchTab('login')">Inloggen</button>
+          <button class="login-tab" onclick="switchTab('register')">Registreren</button>
+          <button class="login-tab" onclick="switchTab('quick')">Snel Deelnemen</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm" class="form-section active">
+          <form id="loginFormElement" class="form">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" required placeholder="voer@email.nl" />
+            </div>
+
+            <div class="form-group">
+              <label for="password">Wachtwoord</label>
+              <input type="password" id="password" name="password" required placeholder="Voer je wachtwoord in..." />
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: var(--space-lg);">
+              <span>Inloggen</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerForm" class="form-section">
+          <form id="registerFormElement" class="form">
+            <div class="form-group">
+              <label for="register-email">Email</label>
+              <input type="email" id="register-email" name="email" required placeholder="voer@email.nl" />
+            </div>
+
+            <div class="form-group">
+              <label for="register-naam">Naam</label>
+              <input type="text" id="register-naam" name="naam" required placeholder="Voer je naam in..." />
+            </div>
+
+            <div class="form-group">
+              <label for="register-klascode">Klascode</label>
+              <input type="text" id="register-klascode" name="klascode" required placeholder="Voer de klascode in..." />
+              <p class="helper">De klascode die je docent heeft gedeeld</p>
+            </div>
+
+            <div class="form-group">
+              <label for="register-password">Wachtwoord</label>
+              <input type="password" id="register-password" name="password" required minlength="6" placeholder="Minimaal 6 tekens..." />
+            </div>
+
+            <div class="form-group">
+              <label for="register-password2">Bevestig Wachtwoord</label>
+              <input type="password" id="register-password2" name="password2" required minlength="6" placeholder="Herhaal wachtwoord..." />
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: var(--space-lg);">
+              <span>Account Aanmaken</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Quick Join Form -->
+        <div id="quickForm" class="form-section">
+          <form id="quickFormElement" class="form">
+            <div class="form-group">
+              <label for="quick-naam">Naam</label>
+              <input type="text" id="quick-naam" name="naam" required placeholder="Voer je naam in..." />
+            </div>
+
+            <div class="form-group">
+              <label for="quick-klascode">Klascode</label>
+              <input type="text" id="quick-klascode" name="klascode" required placeholder="Voer de klascode in..." />
+              <p class="helper">De klascode die je docent heeft gedeeld</p>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: var(--space-lg);">
+              <span>Snel Deelnemen</span>
+            </button>
+          </form>
+        </div>
+
+        <div style="text-align: center; margin-top: var(--space-xl);">
+          <p class="helper">Heb je geen account? <a href="#" onclick="switchTab('register')" style="color: var(--md-sys-color-primary); font-weight: 500;">Registreer hier</a></p>
+        </div>
+      </div>
+
+      <div class="login-footer">
+        <p class="helper">
+          <a href="index.html" style="color: var(--md-sys-color-primary); text-decoration: none;">
+            ← Terug naar Home
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Load identicon utility
+      const script = document.createElement('script');
+      script.src = 'utils/identicon.js';
+      document.head.appendChild(script);
+
+      // Global function for tab switching
+      function switchTab(tab) {
+        // Hide all forms
+        document.querySelectorAll('.form-section').forEach(section => {
+          section.classList.remove('active');
+        });
+        
+        // Remove active class from all tabs
+        document.querySelectorAll('.login-tab').forEach(tabBtn => {
+          tabBtn.classList.remove('active');
+        });
+        
+        // Show selected form and activate tab
+        const formSection = document.getElementById(tab + 'Form');
+        const tabButton = event.target;
+        
+        if (formSection) {
+          formSection.classList.add('active');
+        }
+        
+        if (tabButton) {
+          tabButton.classList.add('active');
+        }
+        
+        learnerLogin.currentTab = tab;
+      }
+
+      script.onload = function() {
+        initializeApp();
+      };
+
+      class LearnerLogin {
+        constructor() {
+          this.currentTab = 'login';
+          this.token = localStorage.getItem("learnerToken");
+          this.learnerData = localStorage.getItem("learnerData");
+          this.init();
+        }
+
+        init() {
+          // Check if already logged in
+          if (this.token && this.learnerData) {
+            this.redirectToDashboard();
+            return;
+          }
+
+          // Setup form listeners
+          document.getElementById('loginFormElement').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleLogin();
+          });
+
+          document.getElementById('registerFormElement').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleRegister();
+          });
+
+          document.getElementById('quickFormElement').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleQuickJoin();
+          });
+        }
+
+        async handleLogin() {
+          const submitBtn = document.querySelector('#loginFormElement button[type="submit"]');
+          const originalContent = submitBtn.innerHTML;
+          
+          submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416"/></svg><span>Inloggen...</span>`;
+          submitBtn.disabled = true;
+          
+          const formData = new FormData(document.getElementById('loginFormElement'));
+          const email = formData.get('email').trim();
+          const password = formData.get('password');
+
+          try {
+            const response = await fetch('/learner/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email, password }),
+            });
+
+            if (!response.ok) {
+              const error = await response.json().catch(() => ({}));
+              throw new Error(error.error || 'Inloggen mislukt');
+            }
+
+            const data = await response.json();
+            
+            // Store learner data
+            localStorage.setItem('learnerToken', data.token);
+            localStorage.setItem('learnerData', JSON.stringify(data.learner));
+            
+            this.showNotification('Succesvol ingelogd!', 'success');
+            this.redirectToDashboard();
+          } catch (error) {
+            submitBtn.innerHTML = originalContent;
+            submitBtn.disabled = false;
+            this.showNotification(error.message || 'Inloggen mislukt', 'error');
+          }
+        }
+
+        async handleRegister() {
+          const submitBtn = document.querySelector('#registerFormElement button[type="submit"]');
+          const originalContent = submitBtn.innerHTML;
+          
+          submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416"/></svg><span>Aanmaken...</span>`;
+          submitBtn.disabled = true;
+          
+          const formData = new FormData(document.getElementById('registerFormElement'));
+          const email = formData.get('email').trim();
+          const naam = formData.get('naam').trim();
+          const password = formData.get('password');
+          const password2 = formData.get('password2');
+          const klascode = formData.get('klascode').trim();
+
+          // Validate passwords match
+          if (password !== password2) {
+            submitBtn.innerHTML = originalContent;
+            submitBtn.disabled = false;
+            this.showNotification('Wachtwoorden komen niet overeen', 'error');
+            return;
+          }
+
+          try {
+            const response = await fetch('/learner/register', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email, naam, password, klascode }),
+            });
+
+            if (!response.ok) {
+              const error = await response.json().catch(() => ({}));
+              throw new Error(error.error || 'Registreren mislukt');
+            }
+
+            const data = await response.json();
+            
+            // Store learner data
+            localStorage.setItem('learnerToken', data.token);
+            localStorage.setItem('learnerData', JSON.stringify(data.learner));
+            
+            this.showNotification('Account succesvol aangemaakt!', 'success');
+            this.redirectToDashboard();
+          } catch (error) {
+            submitBtn.innerHTML = originalContent;
+            submitBtn.disabled = false;
+            this.showNotification(error.message || 'Registreren mislukt', 'error');
+          }
+        }
+
+        async handleQuickJoin() {
+          const submitBtn = document.querySelector('#quickFormElement button[type="submit"]');
+          const originalContent = submitBtn.innerHTML;
+          
+          submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416"/></svg><span>Deelnemen...</span>`;
+          submitBtn.disabled = true;
+          
+          const formData = new FormData(document.getElementById('quickFormElement'));
+          const naam = formData.get('naam').trim();
+          const klascode = formData.get('klascode').trim();
+
+          try {
+            const response = await fetch('/learner/join-with-klascode', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ klascode, naam }),
+            });
+
+            if (!response.ok) {
+              const error = await response.json().catch(() => ({}));
+              throw new Error(error.error || 'Deelnemen mislukt');
+            }
+
+            const data = await response.json();
+            
+            // Store learner data
+            localStorage.setItem('learnerToken', data.token);
+            localStorage.setItem('learnerData', JSON.stringify(data.learner));
+            
+            this.showNotification('Succesvol deelgen aan klas!', 'success');
+            this.redirectToDashboard();
+          } catch (error) {
+            submitBtn.innerHTML = originalContent;
+            submitBtn.disabled = false;
+            this.showNotification(error.message || 'Deelnemen mislukt', 'error');
+          }
+        }
+
+        redirectToDashboard() {
+          // Get session ID from URL or redirect to learner dashboard
+          const urlParams = new URLSearchParams(window.location.search);
+          const sessionId = urlParams.get('session');
+          
+          if (sessionId) {
+            window.location.href = `leerling.html?session=${sessionId}`;
+          } else {
+            window.location.href = 'leerling_dashboard.html';
+          }
+        }
+
+        showNotification(message, type = 'info') {
+          const notification = document.createElement('div');
+          notification.className = `notification ${type}`;
+          notification.textContent = message;
+          document.body.appendChild(notification);
+          
+          setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => notification.remove(), 300);
+          }, 3000);
+        }
+      }
+
+      // Global learner login instance
+      let learnerLogin;
+
+      // Global function to initialize the app
+      function initializeApp() {
+        learnerLogin = new LearnerLogin();
+      }
+    </script>
+  </body>
+</html>

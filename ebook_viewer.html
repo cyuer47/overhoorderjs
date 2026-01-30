@@ -2,50 +2,271 @@
 <html lang="nl">
   <head>
     <meta charset="utf-8" />
-    <title>Boek Viewer</title>
-    <link rel="stylesheet" href="assets/css/styles.css" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Boek Viewer - Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/material3.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      @supports (view-transition-name: none) {
+        html {
+          view-transition-name: root;
+        }
+      }
+      
+      /* Ebook viewer specific styles */
+      .ebook-container {
+        max-width: 900px;
+        margin: var(--space-xl) auto;
+        background-color: var(--md-sys-color-surface-container);
+        border-radius: var(--md-sys-shape-corner-large);
+        padding: var(--space-xl);
+        border: 1px solid var(--md-sys-color-outline);
+      }
+      
+      .chapter-list {
+        display: grid;
+        gap: var(--space-md);
+        margin-top: var(--space-lg);
+      }
+      
+      .chapter-item {
+        background-color: var(--md-sys-color-surface-variant);
+        padding: var(--space-lg);
+        border-radius: var(--md-sys-shape-corner-medium);
+        border: 1px solid var(--md-sys-color-outline);
+        cursor: pointer;
+        transition: all var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-emphasized);
+      }
+      
+      .chapter-item:hover {
+        background-color: var(--md-sys-color-surface-container-high);
+        box-shadow: var(--md-sys-elevation-level1);
+        transform: translateY(-1px);
+      }
+      
+      .chapter-title {
+        color: var(--md-sys-color-on-surface);
+        font-weight: 600;
+        margin: 0 0 var(--space-xs) 0;
+      }
+      
+      .chapter-desc {
+        color: var(--md-sys-color-on-surface-variant);
+        margin: 0;
+        line-height: 1.5;
+      }
+    </style>
   </head>
   <body>
-    <div class="container card" style="max-width: 900px; margin: 40px auto">
-      <h2 id="title">Boek laden...</h2>
-      <p id="desc"></p>
-      <div id="content">
-        Als het boek geladen is, verschijnen hier de hoofdstukken.
-      </div>
-      <div style="margin-top: 12px">
-        <a href="dashboard.html">Terug naar dashboard</a>
-      </div>
+    <div class="container">
+      <header class="header">
+        <div class="header-content">
+          <button class="btn-secondary" onclick="window.location='dashboard.html'">
+            <svg width="20" height="20" viewBox="0 -960 960 960" fill="currentColor" style="margin-right: var(--space-sm);">
+              <path d="m368-417 202 202-90 89-354-354 354-354 90 89-202 202h466v126H368Z"/>
+            </svg>
+            Terug
+          </button>
+          <div class="chip">Overhoorder • Boek Viewer</div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="ebook-container fade-in">
+          <div style="text-align: center; margin-bottom: var(--space-xl);">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--md-sys-color-tertiary), var(--md-sys-color-primary)); border-radius: var(--md-sys-shape-corner-extra-large); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-lg); animation: float 3s ease-in-out infinite;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h1 id="title" style="margin: 0 0 var(--space-sm) 0; color: var(--md-sys-color-on-surface);">Boek laden...</h1>
+            <p id="desc" class="helper" style="margin: 0;"></p>
+          </div>
+          
+          <div id="content">
+            <p class="helper" style="text-align: center;">Als het boek geladen is, verschijnen hier de hoofdstukken.</p>
+          </div>
+        </div>
+      </main>
     </div>
+
     <script>
-      (async function () {
-        const token = localStorage.getItem("token");
-        if (!token) return (window.location = "login.html");
-        try {
-          const res = await fetch("/my-current-ebook", {
-            headers: { Authorization: "Bearer " + token },
-          });
-          if (!res.ok) {
-            document.getElementById("title").textContent =
-              "Kon boek niet laden";
-            return;
-          }
-          const j = await res.json();
-          if (!j.id) {
-            document.getElementById("title").textContent =
-              "Geen boek geselecteerd";
-            return;
-          }
-          document.getElementById("title").textContent =
-            j.book?.titel || "Onbekend boek";
-          document.getElementById("desc").textContent =
-            j.book?.omschrijving || "";
-          // TODO: load actual book content from server or static files
-        } catch (err) {
-          document.getElementById("title").textContent = "Fout bij laden";
-          console.error(err);
+      // Load identicon utility
+      const script = document.createElement('script');
+      script.src = 'utils/identicon.js';
+      document.head.appendChild(script);
+
+      class EbookViewer {
+        constructor() {
+          this.token = localStorage.getItem("token");
+          this.init();
         }
-      })();
+
+        init() {
+          if (!this.token) {
+            window.location = "login.html";
+            return;
+          }
+
+          this.loadEbook();
+        }
+
+        async loadEbook() {
+          try {
+            const res = await fetch("/my-current-ebook", {
+              headers: { Authorization: "Bearer " + this.token },
+            });
+
+            if (!res.ok) {
+              throw new Error("Kon boek niet laden");
+            }
+
+            const ebook = await res.json();
+            this.renderEbook(ebook);
+          } catch (error) {
+            console.error("Error loading ebook:", error);
+            this.showError("Kon boek niet laden");
+          }
+        }
+
+        renderEbook(ebook) {
+          document.getElementById("title").textContent = ebook.titel || "Boek";
+          document.getElementById("desc").textContent = ebook.omschrijving || "";
+
+          const content = document.getElementById("content");
+          
+          if (!ebook.hoofdstukken || ebook.hoofdstukken.length === 0) {
+            content.innerHTML = '<p class="helper" style="text-align: center;">Geen hoofdstukken beschikbaar</p>';
+            return;
+          }
+
+          const chapterList = document.createElement('div');
+          chapterList.className = 'chapter-list';
+          
+          ebook.hoofdstukken.forEach((hoofdstuk, index) => {
+            const chapterItem = document.createElement('div');
+            chapterItem.className = 'chapter-item';
+            chapterItem.style.animationDelay = `${index * 0.05}s`;
+            chapterItem.className += ' slide-in';
+            
+            chapterItem.innerHTML = `
+              <h3 class="chapter-title">Hoofdstuk ${hoofdstuk.nummer}: ${this.escapeHtml(hoofdstuk.titel)}</h3>
+              <p class="chapter-desc">${this.escapeHtml(hoofdstuk.omschrijving || 'Geen beschrijving beschikbaar')}</p>
+            `;
+            
+            chapterItem.addEventListener('click', () => {
+              this.openChapter(hoofdstuk);
+            });
+            
+            chapterList.appendChild(chapterItem);
+          });
+          
+          content.innerHTML = '';
+          content.appendChild(chapterList);
+        }
+
+        openChapter(hoofdstuk) {
+          // In a real implementation, this would open the chapter content
+          // For now, we'll show a modal with the chapter info
+          this.showModal(
+            `Hoofdstuk ${hoofdstuk.nummer}`,
+            `
+              <h3 style="margin: 0 0 var(--space-md) 0; color: var(--md-sys-color-on-surface);">${this.escapeHtml(hoofdstuk.titel)}</h3>
+              <p style="color: var(--md-sys-color-on-surface-variant); line-height: 1.6;">${this.escapeHtml(hoofdstuk.omschrijving || 'Geen beschrijving beschikbaar')}</p>
+              <p style="color: var(--md-sys-color-on-surface-variant); font-style: italic;">Hoofdstuk content wordt hier getoond in de volledige implementatie.</p>
+            `,
+            null
+          );
+        }
+
+        showModal(title, content, onConfirm) {
+          const modal = document.createElement('div');
+          modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--md-sys-color-scrim);
+            z-index: var(--z-modal-backdrop);
+            display: flex; align-items: center; justify-content: center;
+            animation: fadeIn var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized);
+          `;
+          
+          modal.innerHTML = `
+            <div class="modal-content fade-in" style="
+              background-color: var(--md-sys-color-surface-container);
+              padding: var(--space-xl);
+              border-radius: var(--md-sys-shape-corner-extra-large);
+              box-shadow: var(--md-sys-elevation-level5);
+              z-index: var(--z-modal);
+              max-width: 600px;
+              width: 90%;
+              max-height: 90vh;
+              overflow-y: auto;
+            ">
+              <h3 style="margin: 0 0 var(--space-md) 0; color: var(--md-sys-color-on-surface);">${title}</h3>
+              <div style="margin-bottom: var(--space-lg);">${content}</div>
+              <div style="display: flex; gap: var(--space-md); justify-content: flex-end;">
+                <button class="btn-secondary" onclick="this.closest('div[style*=position]').remove()">Sluiten</button>
+                ${onConfirm ? '<button class="btn-primary" onclick="ebookViewer.confirmModalAction()">Bevestigen</button>' : ''}
+              </div>
+            </div>
+          `;
+          
+          document.body.appendChild(modal);
+          
+          if (onConfirm) {
+            this.pendingAction = onConfirm;
+          }
+          
+          // Add click outside to close
+          modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+              modal.remove();
+            }
+          });
+        }
+
+        confirmModalAction() {
+          if (this.pendingAction) {
+            this.pendingAction();
+            this.pendingAction = null;
+          }
+          document.querySelector('div[style*=position]').remove();
+        }
+
+        showError(message) {
+          const title = document.getElementById("title");
+          const desc = document.getElementById("desc");
+          const content = document.getElementById("content");
+          
+          title.textContent = "Fout";
+          desc.textContent = message;
+          content.innerHTML = `
+            <div class="notification error" style="margin: var(--space-lg) 0;">
+              ${message}
+            </div>
+            <div style="text-align: center; margin-top: var(--space-lg);">
+              <button class="btn-primary" onclick="window.location='dashboard.html'">
+                Terug naar Dashboard
+              </button>
+            </div>
+          `;
+        }
+
+        escapeHtml(text) {
+          if (!text) return '';
+          return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        }
+      }
+
+      // Initialize ebook viewer
+      const ebookViewer = new EbookViewer();
     </script>
   </body>
 </html>
