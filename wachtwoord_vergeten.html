@@ -1,228 +1,129 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="nl">
   <head>
     <meta charset="utf-8" />
     <title>Wachtwoord Vergeten - Overhoorder</title>
-    <link rel="stylesheet" href="assets/css/styles.css" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <link rel="icon" type="image/x-icon" href="assets/img/logo2.png" />
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script>
-      !(function (t, e) {
-        var o, n, p, r;
-        e.__SV ||
-          (window.posthog && window.posthog.__loaded) ||
-          ((window.posthog = e),
-          (e._i = []),
-          (e.init = function (i, s, a) {
-            function g(t, e) {
-              var o = e.split(".");
-              (2 == o.length && ((t = t[o[0]]), (e = o[1])),
-                (t[e] = function () {
-                  t.push([e].concat(Array.prototype.slice.call(arguments, 0)));
-                }));
-            }
-            (((p = t.createElement("script")).type = "text/javascript"),
-              (p.crossOrigin = "anonymous"),
-              (p.async = !0),
-              (p.src =
-                s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") +
-                "/static/array.js"),
-              (r = t.getElementsByTagName("script")[0]).parentNode.insertBefore(
-                p,
-                r,
-              ));
-            var u = e;
-            for (
-              void 0 !== a ? (u = e[a] = []) : (a = "posthog"),
-                u.people = u.people || [],
-                u.toString = function (t) {
-                  var e = "posthog";
-                  return (
-                    "posthog" !== a && (e += "." + a),
-                    t || (e += " (stub)"),
-                    e
-                  );
-                },
-                u.people.toString = function () {
-                  return u.toString(1) + ".people (stub)";
-                },
-                o =
-                  "init Ce js Ls Te Fs Ds capture Ye calculateEventProperties zs register register_once register_for_session unregister unregister_for_session Ws getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty Bs Us createPersonProfile Hs Ms Gs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Ns debug L qs getPageViewId captureTraceFeedback captureTraceMetric".split(
-                    " ",
-                  ),
-                n = 0;
-              n < o.length;
-              n++
-            )
-              g(u, o[n]);
-            e._i.push([i, s, a]);
-          }),
-          (e.__SV = 1));
-      })(document, window.posthog || []);
-      posthog.init("phc_bjbHSOWX3nTZKHLlw7SSkutWkjSfTV38ewAcRmxPsYN", {
-        api_host: "https://eu.i.posthog.com",
-        defaults: "2025-05-24",
-        person_profiles: "always",
-      });
-
-      // Initialiseer EmailJS - vervang met je eigen public key
-      emailjs.init("_5nMPin9W_sYKgFZw");
-    </script>
+    <link rel="stylesheet" href="assets/css/material3.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      @supports (view-transition-name: none) {
+        html {
+          view-transition-name: root;
+        }
+    }
+    </style>
   </head>
   <body>
     <div class="container">
-      <div class="container card" style="max-width: 420px; margin: 40px auto">
-        <div style="margin-bottom: 12px">
-          <a href="login.html" class="btn-text">Terug naar inloggen</a>
-        </div>
-
-        <h2>Wachtwoord Vergeten</h2>
-        <p class="helper" style="margin-bottom: 16px">
-          Voer je e-mailadres in en we sturen je een link om je wachtwoord te
-          resetten
-        </p>
-
-        <div id="error" style="color: var(--error); display: none"></div>
-        <div id="message" style="color: green; display: none"></div>
-
-        <form id="forgotForm">
-          <label for="email">E-mailadres</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            placeholder="jouw.email@school.nl"
-          />
-
-          <!-- Verborgen velden voor EmailJS template -->
-          <input
-            type="hidden"
-            name="website_link"
-            id="website_link"
-            value="https://overhoren.ivenboxem.nl"
-          />
-          <input
-            type="hidden"
-            name="company_name"
-            id="company_name"
-            value="Overhoorder"
-          />
-          <input type="hidden" name="user_email" id="user_email" />
-          <input type="hidden" name="reset_link" id="reset_link" />
-
-          <div style="margin-top: 16px">
-            <button
-              type="submit"
-              id="submitBtn"
-              class="btn-primary"
-              style="width: 100%"
-            >
-              Verstuur herstellink
+      <main class="main-content" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+        <section class="card fade-in" style="max-width: 480px; width: 100%;">
+          <div class="card-header" style="text-align: center; margin-bottom: var(--space-xl);">
+            <button class="btn-secondary" onclick="window.location='login.html'" style="position: absolute; top: var(--space-lg); left: var(--space-lg);">
+              <svg width="20" height="20" viewBox="0 -960 960 960" fill="currentColor" style="margin-right: var(--space-sm);">
+                <path d="m368-417 202 202-90 89-354-354 354-354 90 89-202 202h466v126H368Z"/>
+              </svg>
+              Terug
             </button>
+            
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--md-sys-color-tertiary), var(--md-sys-color-primary)); border-radius: var(--md-sys-shape-corner-extra-large); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-lg); animation: float 3s ease-in-out infinite;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="11" width="18" height="10" rx="2" ry="2" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 17V15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h1 style="margin: 0; color: var(--md-sys-color-on-surface); font-size: 2rem; font-weight: 700;">Wachtwoord Vergeten</h1>
+            <p class="helper" style="margin: 0;">Voer je email in om een herstel link te ontvangen</p>
           </div>
-        </form>
-      </div>
+
+          <form id="forgotForm" class="form">
+            <div id="error" class="notification error" style="display: none; margin-bottom: var(--space-md);"></div>
+            <div id="success" class="notification success" style="display: none; margin-bottom: var(--space-md);"></div>
+            
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" required placeholder="voer@email.nl" />
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: var(--space-lg);">
+              <span>Herstel Link Sturen</span>
+            </button>
+          </form>
+
+          <div style="text-align: center; margin-top: var(--space-xl);">
+            <p class="helper" style="margin: 0;">
+              Onthoud je wachtwoord? <a href="login.html" style="color: var(--md-sys-color-primary); font-weight: 500;">Log in</a>
+            </p>
+          </div>
+        </section>
+      </main>
     </div>
 
     <script>
-      // EmailJS configuratie - vervang met je eigen gegevens
-      const EMAILJS_SERVICE_ID = "default_service"; // Van EmailJS dashboard
-      const EMAILJS_TEMPLATE_ID = "template_xusevrj"; // Van EmailJS dashboard
+      // Load identicon utility
+      const script = document.createElement('script');
+      script.src = 'utils/identicon.js';
+      document.head.appendChild(script);
 
-      // DOM elements
-      const forgotForm = document.getElementById("forgotForm");
-      const emailInput = document.getElementById("email");
-      const userEmailInput = document.getElementById("user_email");
-      const resetLinkInput = document.getElementById("reset_link");
-      const errorDiv = document.getElementById("error");
-      const messageDiv = document.getElementById("message");
-      const submitBtn = document.getElementById("submitBtn");
-
-      // Form submission
-      forgotForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const email = emailInput.value.trim();
-
-        // Client-side validation
-        if (!email || !isValidEmail(email)) {
-          showError("Ongeldig e-mailadres.");
-          return;
-        }
-
-        // Genereer reset token en link
-        const token = generateToken();
-        const resetLink = `https://overhoren.ivenboxem.nl/wachtwoord_herstellen.html?token=${token}`;
-
-        // Vul de verborgen velden
-        userEmailInput.value = email;
-        resetLinkInput.value = resetLink;
-
-        // Sla token op in localStorage (voor demo - in productie gebruik backend)
-        localStorage.setItem(
-          `reset_token_${email}`,
-          JSON.stringify({
-            token: token,
-            expiry: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 uur
-          }),
-        );
-
-        // Update button state
+      // Forgot password form handler
+      document.getElementById("forgotForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalContent = submitBtn.innerHTML;
+        const errorDiv = document.getElementById("error");
+        const successDiv = document.getElementById("success");
+        
+        submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416"/></svg><span>Verzenden...</span>`;
         submitBtn.disabled = true;
-        submitBtn.textContent = "Bezig met versturen...";
+        errorDiv.style.display = 'none';
+        successDiv.style.display = 'none';
 
-        // Verstuur email via EmailJS sendForm
-        emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, this).then(
-          () => {
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Verstuur herstellink";
-            showMessage("Een herstellink is naar je e-mailadres verstuurd.");
-            forgotForm.reset();
+        const formData = new FormData(e.target);
+        const email = formData.get("email").trim();
 
-            // Log voor debugging
-            console.log(`Reset link for ${email}: ${resetLink}`);
-          },
-          (err) => {
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Verstuur herstellink";
-            console.error("EmailJS error:", err);
+        try {
+          const res = await fetch("/api/auth/forgot", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          });
 
-            if (err.text === "User does not exist") {
-              showError("Geen gebruiker gevonden met dit e-mailadres.");
-            } else {
-              showError(
-                "Fout bij het versturen van de e-mail. Controleer je EmailJS configuratie.",
-              );
-            }
-          },
-        );
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error || "Kon herstel link niet sturen");
+          }
+
+          // Show success message
+          successDiv.textContent = "Herstel link is verstuurd naar je email. Controleer je inbox.";
+          successDiv.style.display = 'block';
+          
+          // Reset form
+          e.target.reset();
+          submitBtn.innerHTML = originalContent;
+          submitBtn.disabled = false;
+        } catch (err) {
+          errorDiv.textContent = err.message;
+          errorDiv.style.display = 'block';
+          submitBtn.innerHTML = originalContent;
+          submitBtn.disabled = false;
+        }
       });
 
-      function generateToken() {
-        return (
-          Math.random().toString(36).substring(2, 15) +
-          Math.random().toString(36).substring(2, 15) +
-          Math.random().toString(36).substring(2, 15)
-        );
-      }
-
-      function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-      }
-
-      function showError(message) {
-        errorDiv.textContent = message;
-        errorDiv.style.display = "block";
-        messageDiv.style.display = "none";
-      }
-
-      function showMessage(message) {
-        messageDiv.textContent = message;
-        messageDiv.style.display = "block";
-        errorDiv.style.display = "none";
+      // Show notification helper
+      function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.style.animation = 'slideOutRight 0.3s ease-out';
+          setTimeout(() => notification.remove(), 300);
+        }, 3000);
       }
     </script>
   </body>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Instellingen - Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/material3.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      @supports (view-transition-name: none) {
+        html {
+          view-transition-name: root;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="header-content">
+          <div class="chip">Overhoorder • Docent</div>
+          <div class="profile-container">
+            <button class="profile-btn" onclick="toggleProfileMenu()">
+              <img id="avatar" src="" alt="Avatar" class="profile-avatar" />
+              <span id="profile-name" class="profile-name"></span>
+              <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="currentColor">
+                <path d="M7 10l5 5 5-5H7z" />
+              </svg>
+            </button>
+            <div class="profile-menu">
+              <a href="dashboard.html">Dashboard</a>
+              <a href="admin_licenties.html" id="admin-link" style="display: none;">Admin Licenties</a>
+              <a href="#" id="logout-link" class="logout-btn">Uitloggen</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <h1 class="page-title">Instellingen</h1>
+
+        <div class="dashboard-grid">
+          <section class="card fade-in">
+            <div class="card-header">
+              <h3>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                  <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23.15L12 24L16.38 23.15C19.77 20.68 22 16.5 22 12V7L12 2Z" fill="currentColor" opacity="0.2"/>
+                  <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23.15L12 24L16.38 23.15C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Profiel Instellingen
+              </h3>
+            </div>
+            <form id="profileForm" class="form">
+              <div class="form-group">
+                <label for="naam">Naam</label>
+                <input name="naam" id="naam" required placeholder="Voer je naam in..." />
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" required placeholder="voer@email.nl" disabled />
+                <p class="helper">Email kan niet worden gewijzigd</p>
+              </div>
+              <div class="form-group">
+                <label for="avatar">Avatar</label>
+                <div style="display: flex; align-items: center; gap: var(--space-md);">
+                  <img id="avatarPreview" src="" alt="Avatar preview" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--md-sys-color-outline);" />
+                  <div>
+                    <button type="button" class="btn-secondary" onclick="generateNewAvatar()">
+                      Genereer Nieuwe Avatar
+                    </button>
+                    <p class="helper" style="margin-top: var(--space-sm);">Klik om een nieuwe identicon te genereren</p>
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="btn-primary">
+                <span>Profiel Bijwerken</span>
+              </button>
+            </form>
+          </section>
+
+          <section class="card fade-in" style="animation-delay: 0.1s;">
+            <div class="card-header">
+              <h3>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Wachtwoord Wijzigen
+              </h3>
+            </div>
+            <form id="passwordForm" class="form">
+              <div class="form-group">
+                <label for="current_password">Huidig Wachtwoord</label>
+                <input type="password" name="current_password" id="current_password" required placeholder="Voer huidig wachtwoord in..." />
+              </div>
+              <div class="form-group">
+                <label for="new_password">Nieuw Wachtwoord</label>
+                <input type="password" name="new_password" id="new_password" required minlength="6" placeholder="Minimaal 6 tekens..." />
+              </div>
+              <div class="form-group">
+                <label for="confirm_password">Bevestig Nieuw Wachtwoord</label>
+                <input type="password" name="confirm_password" id="confirm_password" required minlength="6" placeholder="Herhaal nieuw wachtwoord..." />
+              </div>
+              <button type="submit" class="btn-primary">
+                <span>Wachtwoord Wijzigen</span>
+              </button>
+            </form>
+          </section>
+
+          <section class="card fade-in" style="animation-delay: 0.2s;">
+            <div class="card-header">
+              <h3>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                  <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23.15L12 24L16.38 23.15C19.77 20.68 22 16.5 22 12V7L12 2Z" fill="currentColor" opacity="0.2"/>
+                  <path d="M12 2L2 7V12C2 16.5 4.23 20.68 7.62 23.15L12 24L16.38 23.15C19.77 20.68 22 16.5 22 12V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Applicatie Instellingen
+              </h3>
+            </div>
+            <div class="form">
+              <div class="form-group">
+                <label>Thema</label>
+                <div style="display: flex; gap: var(--space-md); margin-top: var(--space-sm);">
+                  <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                    <input type="radio" name="theme" value="light" checked>
+                    <span>Light</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                    <input type="radio" name="theme" value="dark">
+                    <span>Dark</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                    <input type="radio" name="theme" value="auto">
+                    <span>Auto</span>
+                  </label>
+                </div>
+                <p class="helper">Kies je voorkeursthema voor de applicatie</p>
+              </div>
+              <div class="form-group">
+                <label>Taal</label>
+                <select name="language" style="margin-top: var(--space-sm);">
+                  <option value="nl" selected>Nederlands</option>
+                  <option value="en">English</option>
+                </select>
+                <p class="helper">Selecteer je voorkeurstaal</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="card fade-in" style="animation-delay: 0.3s;">
+            <div class="card-header">
+              <h3>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                  <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Gegevens Verwijderen
+              </h3>
+            </div>
+            <div class="form">
+              <p class="helper">Let op: Het verwijderen van je account kan niet ongedaan worden gemaakt.</p>
+              <button type="button" class="btn-danger" onclick="confirmDeleteAccount()">
+                Account Verwijderen
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script src="settings.js"></script>
+  </body>
+</html>

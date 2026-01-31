@@ -1,15 +1,37 @@
 {
+  "name": "overhoorderjs",
+  "version": "1.0.0",
+  "description": "Educational quiz application for Dutch VO schools with real-time features",
   "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:new": "node server_new.js",
+    "dev": "node --watch server.js",
+    "dev:new": "node --watch server_new.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "education",
+    "quiz",
+    "interactive",
+    "realtime",
+    "websocket",
+    "sse",
+    "license-management"
+  ],
+  "author": "Iven",
+  "license": "MIT",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
-    "fs": "^0.0.1-security",
+    "express-validator": "^7.0.0",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^7.0.13",
-    "path": "^0.12.7",
     "sqlite": "^5.1.1",
-    "sqlite3": "^5.1.7",
-    "url": "^0.11.4"
+    "sqlite3": "^5.1.7"
   }
 }
