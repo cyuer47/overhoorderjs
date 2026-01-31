@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Instellingen - Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="icon" type="image/x-icon" href="assets/img/logo2.png" />
+    <script src="https://cdn.jsdelivr.net/npm/jdenticon@3.2.0/dist/jdenticon.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <a
+        href="dashboard.html"
+        class="btn-text"
+        style="
+          margin-bottom: 12px;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        "
+      >
+        ← Terug naar dashboard
+      </a>
+      <h1>Instellingen</h1>
+      <p class="helper">
+        Pas hier je profiel aan. Je kunt een profielfoto uploaden of een
+        automatisch gegenereerde identicon gebruiken.
+      </p>
+
+      <div class="card">
+        <div class="profile-grid">
+          <div class="avatar-box">
+            <div class="avatar-preview" id="avatarPreview" title="Avatar">
+              <!-- identicon or img will be injected -->
+              <svg id="identiconSvg"></svg>
+            </div>
+            <div style="margin-top: 8px">
+              <input
+                type="file"
+                id="avatarFile"
+                accept="image/*"
+                class="small"
+              />
+            </div>
+            <div style="margin-top: 8px">
+              <button id="removeAvatar" class="btn-secondary small">
+                Verwijder avatar
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <form id="profileForm">
+              <div class="field">
+                <label>Naam</label>
+                <input type="text" id="naam" name="naam" required />
+              </div>
+              <div class="field">
+                <label>E-mail</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+              <div class="field">
+                <label>Vakken (komma gescheiden)</label>
+                <input type="text" id="vakken" name="vakken" />
+              </div>
+              <div class="field">
+                <label>Bio</label>
+                <textarea id="bio" name="bio" rows="4"></textarea>
+              </div>
+
+              <hr />
+              <h3 class="small">Wachtwoord wijzigen</h3>
+              <div class="field">
+                <label>Nieuw wachtwoord</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="Laat leeg om niet te wijzigen"
+                />
+              </div>
+              <div class="field">
+                <label>Bevestig nieuw wachtwoord</label>
+                <input
+                  type="password"
+                  id="passwordConfirm"
+                  name="passwordConfirm"
+                  placeholder="Bevestig wachtwoord"
+                />
+              </div>
+
+              <div
+                style="
+                  margin-top: 12px;
+                  display: flex;
+                  gap: 8px;
+                  align-items: center;
+                "
+              >
+                <button type="submit" class="btn-primary">Opslaan</button>
+                <button
+                  type="button"
+                  id="regenIdenticon"
+                  class="btn-secondary small"
+                >
+                  Genereer identicon
+                </button>
+                <label
+                  style="
+                    margin-left: auto;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                  "
+                >
+                  <input type="checkbox" id="isPublic" /> Profiel openbaar
+                </label>
+              </div>
+
+              <div id="message" class="form-success">Opgeslagen ✅</div>
+              <div id="error" class="form-error">Fout bij opslaan</div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location =
+          "login.html?redirecturi=" +
+          encodeURIComponent("docent_settings.html");
+      }
+
+      let currentProfile = null;
+      let pendingAvatarData = null; // Data URL if user uploaded
+
+      async function loadProfile() {
+        try {
+          const res = await fetch("/profile", {
+            headers: { Authorization: "Bearer " + token },
+          });
+          if (!res.ok) throw new Error("Fetch profile failed");
+          const data = await res.json();
+          currentProfile = data.profile || {};
+          document.getElementById("naam").value = currentProfile.naam || "";
+          document.getElementById("email").value = currentProfile.email || "";
+          document.getElementById("vakken").value = currentProfile.vakken || "";
+          document.getElementById("bio").value = currentProfile.bio || "";
+          document.getElementById("isPublic").checked =
+            !!currentProfile.is_public;
+          renderAvatar();
+        } catch (err) {
+          console.error(err);
+          showError("Kon profiel niet laden.");
+        }
+      }
+
+      function renderAvatar() {
+        const preview = document.getElementById("avatarPreview");
+        const svgContainer = document.getElementById("identiconSvg");
+        preview.innerHTML = "";
+        if (pendingAvatarData) {
+          const img = document.createElement("img");
+          img.src = pendingAvatarData;
+          preview.appendChild(img);
+          return;
+        }
+        if (currentProfile && currentProfile.avatar) {
+          const img = document.createElement("img");
+          img.src = currentProfile.avatar;
+          preview.appendChild(img);
+          return;
+        }
+        // show identicon
+        const seed =
+          currentProfile && currentProfile.email
+            ? currentProfile.email
+            : String(Date.now());
+        const svg = jdenticon.toSvg(seed, 140);
+        preview.innerHTML = svg;
+      }
+
+      document.getElementById("avatarFile").addEventListener("change", (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          pendingAvatarData = reader.result;
+          renderAvatar();
+        };
+        reader.readAsDataURL(f);
+      });
+
+      document.getElementById("removeAvatar").addEventListener("click", () => {
+        pendingAvatarData = "";
+        currentProfile.avatar = null;
+        renderAvatar();
+      });
+
+      document
+        .getElementById("regenIdenticon")
+        .addEventListener("click", () => {
+          // regenerate identicon by re-rendering (seed is email)
+          pendingAvatarData = null;
+          renderAvatar();
+        });
+
+      function showMessage(msg) {
+        const el = document.getElementById("message");
+        el.textContent = msg;
+        el.style.display = "block";
+        setTimeout(() => (el.style.display = "none"), 3000);
+      }
+      function showError(msg) {
+        const el = document.getElementById("error");
+        el.textContent = msg;
+        el.style.display = "block";
+        setTimeout(() => (el.style.display = "none"), 3000);
+      }
+
+      document
+        .getElementById("profileForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const naam = document.getElementById("naam").value.trim();
+          const email = document.getElementById("email").value.trim();
+          const vakken = document.getElementById("vakken").value.trim();
+          const bio = document.getElementById("bio").value.trim();
+          const password = document.getElementById("password").value;
+          const passwordConfirm =
+            document.getElementById("passwordConfirm").value;
+          const is_public = document.getElementById("isPublic").checked ? 1 : 0;
+
+          if (password && password !== passwordConfirm) {
+            showError("Wachtwoorden komen niet overeen.");
+            return;
+          }
+          const payload = { naam, email, vakken, bio, is_public };
+          if (password) payload.password = password;
+          if (pendingAvatarData !== null) payload.avatar = pendingAvatarData; // can be empty string to clear
+
+          try {
+            const res = await fetch("/profile", {
+              method: "POST",
+              headers: {
+                Authorization: "Bearer " + token,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(payload),
+            });
+            if (!res.ok) {
+              const err = await res.json().catch(() => ({}));
+              showError(err.error || "Kon profiel niet opslaan.");
+              return;
+            }
+            const data = await res.json();
+            currentProfile = data.profile || currentProfile;
+            pendingAvatarData = null;
+            renderAvatar();
+            showMessage("Opgeslagen");
+            // Clear password fields
+            document.getElementById("password").value = "";
+            document.getElementById("passwordConfirm").value = "";
+          } catch (err) {
+            console.error(err);
+            showError("Er is een fout opgetreden.");
+          }
+        });
+
+      // Theme functions removed — theme toggle handled globally (removed here)
+
+      loadProfile();
+    </script>
+  </body>
+</html>

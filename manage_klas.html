@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Beheer klas</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      .edit-input {
+        border: none;
+        background: transparent;
+        width: auto;
+        font: inherit;
+        padding: 4px 6px;
+        border-radius: 8px;
+      }
+      .edit-input:focus {
+        background: #f1f1f1;
+        outline: 2px solid var(--md-sys-color-primary, #3b4fe4);
+      }
+      .vragenlijst-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px;
+        margin: 8px 0;
+        background: #f5f5f5;
+        border-radius: 8px;
+      }
+      .vragenlijst-actions {
+        display: flex;
+        gap: 8px;
+      }
+      .btn-icon {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+      }
+      .btn-icon svg {
+        width: 20px;
+        height: 20px;
+        fill: var(--on-primary-container, #333);
+      }
+      .btn-icon:hover svg {
+        fill: var(--md-sys-color-primary, #3b4fe4);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="dashboard.html" class="btn-text">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="var(--svg-icons)"
+        >
+          <path
+            d="m368-417 202 202-90 89-354-354 354-354 90 89-202 202h466v126H368Z"
+          />
+        </svg>
+      </a>
+
+      <h1 id="klas-title" class="app-title">Beheer klas</h1>
+
+      <div class="card">
+        <h3>Leerlingen</h3>
+        <ul id="leerlingen-list"></ul>
+        <button
+          class="btn-danger"
+          onclick="deleteAllStudents()"
+          style="margin-top: 12px"
+        >
+          Verwijder alle leerlingen
+        </button>
+      </div>
+
+      <div style="height: 16px"></div>
+
+      <div class="card">
+        <h3>Vragenlijsten</h3>
+        <form onsubmit="createVragenlijst(event)">
+          <input
+            id="vragenlijst-naam"
+            placeholder="Naam vragenlijst"
+            style="width: calc(100% - 110px); margin-bottom: 12px"
+            required
+          />
+          <button class="btn-primary" type="submit">Aanmaken</button>
+        </form>
+        <div id="vragenlijsten-list"></div>
+      </div>
+
+      <div style="height: 16px"></div>
+
+      <div class="card">
+        <button class="btn-danger" onclick="deleteKlas()" style="width: 100%">
+          Verwijder deze klas
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const klasId = params.get("klas");
+
+      if (!klasId) {
+        alert("Geen klas geselecteerd");
+        window.location = "dashboard.html";
+      }
+
+      async function loadKlas() {
+        const token = localStorage.getItem("token");
+        if (!token) return (window.location = "login.html");
+
+        try {
+          const res = await fetch(`/klas/${klasId}`, {
+            headers: { Authorization: "Bearer " + token },
+          });
+          if (!res.ok) {
+            if (res.status === 403 || res.status === 404) {
+              alert("Geen rechten of klas niet gevonden");
+              return (window.location = "dashboard.html");
+            }
+            throw new Error("Kon klas niet laden");
+          }
+
+          const data = await res.json();
+          document.getElementById(
+            "klas-title"
+          ).textContent = `Beheer: ${data.klas.naam}`;
+
+          // Leerlingen
+          const lList = document.getElementById("leerlingen-list");
+          lList.innerHTML = "";
+          if (!data.leerlingen || data.leerlingen.length === 0) {
+            lList.innerHTML = '<p class="helper">Geen leerlingen.</p>';
+          } else {
+            const ul = document.createElement("ul");
+            data.leerlingen.forEach((l) => {
+              const li = document.createElement("li");
+              li.textContent = l.naam;
+              ul.appendChild(li);
+            });
+            lList.appendChild(ul);
+          }
+
+          // Vragenlijsten
+          const vList = document.getElementById("vragenlijsten-list");
+          vList.innerHTML = "";
+          if (!data.vragenlijsten || data.vragenlijsten.length === 0) {
+            vList.innerHTML = '<p class="helper">Nog geen vragenlijsten.</p>';
+          } else {
+            data.vragenlijsten.forEach((v) => {
+              const div = document.createElement("div");
+              div.className = "vragenlijst-item";
+              div.innerHTML = `
+              <a href="manage_vragenlijst.html?id=${
+                v.id
+              }" style="flex: 1; text-decoration: none; color: inherit;">
+                ${escapeHtml(v.naam)}
+              </a>
+              <div class="vragenlijst-actions">
+                <button class="btn-icon" onclick="editVragenlijst(${
+                  v.id
+                }, this);" title="Bewerk">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                    <path d="M211-212h58l323-323-56-57-325 325v55ZM86-86v-234l526-526q14-14 31.5-21t36.5-7q18 0 36 7t33 21l98 96q14 14 21 32.5t7 37.5q0 19-7 37t-21 32L322-86H86Zm652-594-57-58 57 58ZM564-564l-28-28 56 57-28-29Z"/>
+                  </svg>
+                </button>
+                <button class="btn-icon" onclick="deleteVragenlijst(${
+                  v.id
+                });" title="Verwijder">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                    <path d="M269-86q-53 0-89.5-36.5T143-212v-497H80v-126h257v-63h284v63h259v126h-63v497q0 53-36.5 89.5T691-86H269Zm422-623H269v497h422v-497ZM342-281h103v-360H342v360Zm173 0h103v-360H515v360ZM269-709v497-497Z"/>
+                  </svg>
+                </button>
+              </div>
+            `;
+              vList.appendChild(div);
+            });
+          }
+        } catch (err) {
+          alert("Fout: " + err.message);
+        }
+      }
+
+      function escapeHtml(s) {
+        if (!s) return "";
+        return String(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[c])
+        );
+      }
+
+      async function createVragenlijst(e) {
+        e.preventDefault();
+        const token = localStorage.getItem("token");
+        if (!token) return (window.location = "login.html");
+
+        const naam = document.getElementById("vragenlijst-naam").value.trim();
+        if (!naam) return alert("Vul een naam in");
+
+        try {
+          const res = await fetch("/vragenlijst", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({ klas_id: parseInt(klasId), naam }),
+          });
+          if (!res.ok) throw new Error("Kon vragenlijst niet aanmaken");
+          document.getElementById("vragenlijst-naam").value = "";
+          loadKlas();
+        } catch (err) {
+          alert("Fout: " + err.message);
+        }
+      }
+
+      async function editVragenlijst(id, btn) {
+        const token = localStorage.getItem("token");
+        if (!token) return (window.location = "login.html");
+        const newNaam = prompt("Nieuwe naam:");
+        if (!newNaam) return;
+
+        try {
+          const res = await fetch(`/vragenlijst/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({ naam: newNaam }),
+          });
+          if (!res.ok) throw new Error("Kon vragenlijst niet updaten");
+          loadKlas();
+        } catch (err) {
+          alert("Fout: " + err.message);
+        }
+      }
+
+      async function deleteVragenlijst(id) {
+        if (!confirm("Weet je zeker dat je deze vragenlijst wilt verwijderen?"))
+          return;
+        const token = localStorage.getItem("token");
+        if (!token) return (window.location = "login.html");
+
+        try {
+          const res = await fetch(`/vragenlijst/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: "Bearer " + token },
+          });
+          if (!res.ok) throw new Error("Kon vragenlijst niet verwijderen");
+          loadKlas();
+        } catch (err) {
+          alert("Fout: " + err.message);
+        }
+      }
+
+      async function deleteAllStudents() {
+        if (!confirm("Alle leerlingen verwijderen?")) return;
+        const token = localStorage.getItem("token");
+        if (!token) return (window.location = "login.html");
+
+        try {
+          const res = await fetch("/delete-leerlingen", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({ klas_id: parseInt(klasId) }),
+          });
+          if (!res.ok) throw new Error("Kon leerlingen niet verwijderen");
+          loadKlas();
+        } catch (err) {
+          alert("Fout: " + err.message);
+        }
+      }
+
+      async function deleteKlas() {
+        if (
+          !confirm(
+            "Weet je zeker dat je deze klas wilt verwijderen? Alle leerlingen, vragen en resultaten zullen ook worden verwijderd."
+          )
+        )
+          return;
+        const token = localStorage.getItem("token");
+        if (!token) return (window.location = "login.html");
+
+        try {
+          const res = await fetch("/delete-klas", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({ id: parseInt(klasId) }),
+          });
+          if (!res.ok) throw new Error("Kon klas niet verwijderen");
+          window.location = "dashboard.html";
+        } catch (err) {
+          alert("Fout: " + err.message);
+        }
+      }
+
+      loadKlas();
+    </script>
+  </body>
+</html>

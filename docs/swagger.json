@@ -1,0 +1,606 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Swagger documentatie van de Overhoorder API (Node.js versie)",
+    "version": "1.1.0",
+    "title": "Overhoorder API"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [{ "ApiKeyAuth": [] }],
+  "tags": [
+    { "name": "auth", "description": "Authenticatie en gebruikersbeheer" },
+    { "name": "docent", "description": "Endpoints voor docenten" },
+    { "name": "sessie", "description": "Sessies en real-time" },
+    { "name": "vragenlijst", "description": "Vragenlijsten en vragen" },
+    { "name": "leerling", "description": "Leerlingenbeheer" }
+  ],
+  "paths": {
+    "/register": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Registreer een docent",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "string" },
+                "password": { "type": "string" },
+                "naam": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Registratie gelukt" } }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Login voor docent",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "string" },
+                "password": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Login gelukt" } }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Informatie over de ingelogde gebruiker",
+        "responses": { "200": { "description": "Succesvol" } }
+      }
+    },
+    "/create-klas": {
+      "post": {
+        "tags": ["docent"],
+        "summary": "Nieuwe klas aanmaken",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "naam": { "type": "string" },
+                "vak": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Klas aangemaakt" } }
+      }
+    },
+    "/klas/{id}": {
+      "get": {
+        "tags": ["docent"],
+        "summary": "Details van een klas ophalen",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/delete-klas": {
+      "post": {
+        "tags": ["docent"],
+        "summary": "Klas verwijderen",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": { "id": { "type": "integer" } }
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Klas verwijderd" } }
+      }
+    },
+    "/vragenlijst": {
+      "post": {
+        "tags": ["vragenlijst"],
+        "summary": "Nieuwe vragenlijst aanmaken",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "klas_id": { "type": "integer" },
+                "naam": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Vragenlijst aangemaakt" } }
+      }
+    },
+    "/vragenlijst/{id}": {
+      "get": {
+        "tags": ["vragenlijst"],
+        "summary": "Vragenlijst ophalen",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": { "200": { "description": "OK" } }
+      },
+      "put": {
+        "tags": ["vragenlijst"],
+        "summary": "Vragenlijst bewerken",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": { "naam": { "type": "string" } }
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Vragenlijst bijgewerkt" } }
+      },
+      "delete": {
+        "tags": ["vragenlijst"],
+        "summary": "Vragenlijst verwijderen",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": { "200": { "description": "Vragenlijst verwijderd" } }
+      }
+    },
+    "/vragenlijst/{id}/vraag": {
+      "post": {
+        "tags": ["vragenlijst"],
+        "summary": "Vraag toevoegen aan vragenlijst",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "vraag": { "type": "string" },
+                "antwoord": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Vraag toegevoegd" } }
+      }
+    },
+    "/vragen/{id}": {
+      "put": {
+        "tags": ["vragenlijst"],
+        "summary": "Vraag bewerken",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "vraag": { "type": "string" },
+                "antwoord": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Vraag bijgewerkt" } }
+      },
+      "delete": {
+        "tags": ["vragenlijst"],
+        "summary": "Vraag verwijderen",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": { "200": { "description": "Vraag verwijderd" } }
+      }
+    },
+    "/sessies": {
+      "post": {
+        "tags": ["sessie"],
+        "summary": "Nieuwe sessie starten",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "klas_id": { "type": "integer" },
+                "vragenlijst_id": { "type": "integer" }
+              }
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Sessie gestart" } }
+      }
+    },
+    "/sessies/{id}": {
+      "get": {
+        "tags": ["sessie"],
+        "summary": "Sessie details ophalen",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": { "$ref": "#/definitions/SessionPayload" }
+          }
+        }
+      }
+    },
+    "/sessies/{id}/stream": {
+      "get": {
+        "tags": ["sessie"],
+        "summary": "SSE stream voor real-time sessie-updates (alleen docent)",
+        "description": "Server-Sent Events (SSE). The stream sends `session` events containing the session payload (see `SessionPayload` definition). Use `token` query param or Authorization header (Bearer token).",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" },
+          {
+            "name": "token",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": { "200": { "description": "SSE stream (event: session)" } }
+      }
+    },
+    "/sessies/{id}/scoreboard": {
+      "get": {
+        "tags": ["sessie"],
+        "summary": "Scorebord van sessie ophalen",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": { "200": { "description": "Scorebord" } }
+      }
+    },
+    "/sessies/{id}/recent-answers": {
+      "get": {
+        "tags": ["sessie"],
+        "summary": "Recente antwoorden van sessie ophalen",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": { "200": { "description": "Recente antwoorden" } }
+      }
+    },
+    "/sessies/{id}/send_question": {
+      "post": {
+        "tags": ["sessie"],
+        "summary": "Volgende vraag sturen in sessie",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": { "200": { "description": "Vraag verstuurd" } }
+      }
+    },
+    "/sessies/{id}/clear_question": {
+      "post": {
+        "tags": ["sessie"],
+        "summary": "Huidige vraag wissen in sessie",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": { "200": { "description": "Vraag gewist" } }
+      }
+    },
+    "/sessies/{id}/export": {
+      "get": {
+        "tags": ["sessie"],
+        "summary": "Exporteer resultaten van sessie als CSV",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": { "200": { "description": "CSV download" } }
+      }
+    },
+    "/sessies/{id}/answer_count": {
+      "get": {
+        "tags": ["sessie"],
+        "summary": "Aantal antwoorden op huidige vraag",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": { "200": { "description": "Aantal antwoorden" } }
+      }
+    },
+    "/sessies/{id}/answer": {
+      "post": {
+        "tags": ["leerling"],
+        "summary": "Leerling stuurt antwoord in sessie",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "leerling_id": { "type": "integer" },
+                "vraag_id": { "type": "integer" },
+                "antwoord": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Antwoord opgeslagen",
+            "schema": { "$ref": "#/definitions/AnswerResponse" }
+          }
+        }
+      }
+    },
+    "/grade-answer": {
+      "post": {
+        "tags": ["sessie"],
+        "summary": "Beoordeel een antwoord",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resultaat_id": { "type": "integer" },
+                "status": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Antwoord beoordeeld" } }
+      }
+    },
+    "/sessies/{id}/leerling/{lid}": {
+      "delete": {
+        "tags": ["sessie"],
+        "summary": "Verwijder leerling uit sessie",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" },
+          { "name": "lid", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": { "200": { "description": "Leerling verwijderd" } }
+      }
+    },
+    "/delete-leerlingen": {
+      "post": {
+        "tags": ["docent"],
+        "summary": "Verwijder alle leerlingen uit klas",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": { "klas_id": { "type": "integer" } }
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Leerlingen verwijderd" } }
+      }
+    },
+    "/leerling/join": {
+      "post": {
+        "tags": ["leerling"],
+        "summary": "Leerling doet mee met klas via klascode",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "klascode": { "type": "string" },
+                "naam": { "type": "string" }
+              },
+              "required": ["klascode", "naam"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deelnemen gelukt",
+            "schema": { "$ref": "#/definitions/JoinResponse" }
+          }
+        }
+      }
+    },
+    "/student/state": {
+      "get": {
+        "tags": ["leerling"],
+        "summary": "Haal state op voor leerling (poll fallback)",
+        "parameters": [
+          {
+            "name": "leerling_id",
+            "in": "query",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "klas_id",
+            "in": "query",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "State",
+            "schema": { "$ref": "#/definitions/StudentState" }
+          }
+        }
+      }
+    },
+    "/status-update": {
+      "post": {
+        "tags": ["leerling"],
+        "summary": "Presence/status update (beacon) - used by student page to report focus/blur/close; broadcasts session updates to teacher SSE",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "leerling_id": { "type": "integer" },
+                "klas_id": { "type": "integer" },
+                "status": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": { "200": { "description": "Ok" } }
+      }
+    }
+  },
+  "definitions": {
+    "Session": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "klas_id": { "type": "integer" },
+        "klasnaam": { "type": "string" },
+        "klascode": { "type": "string" },
+        "vragenlijst_id": { "type": "integer" },
+        "actief": { "type": "boolean" },
+        "total_students": { "type": "integer" },
+        "started_at": { "type": "string" },
+        "question_start_time": { "type": "string" },
+        "current_question_id": { "type": "integer" },
+        "round_seen": { "type": "array", "items": { "type": "integer" } },
+        "created_at": { "type": "string" }
+      }
+    },
+    "CurrentQuestion": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "vraag": { "type": "string" },
+        "antwoord": { "type": "string" }
+      }
+    },
+    "ScoreboardEntry": {
+      "type": "object",
+      "properties": {
+        "leerling_id": { "type": "integer" },
+        "naam": { "type": "string" },
+        "points": { "type": "integer" },
+        "answers": { "type": "integer" }
+      }
+    },
+    "RecentAnswer": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "leerling_id": { "type": "integer" },
+        "leerling": { "type": "string" },
+        "antwoord": { "type": "string" },
+        "status": { "type": "string" },
+        "points": { "type": "integer" },
+        "created_at": { "type": "string" },
+        "vraag": { "type": "string" }
+      }
+    },
+    "SessionPayload": {
+      "type": "object",
+      "properties": {
+        "sess": { "$ref": "#/definitions/Session" },
+        "currentQuestion": { "$ref": "#/definitions/CurrentQuestion" },
+        "answerCount": { "type": "integer" },
+        "total_students": { "type": "integer" },
+        "leerlingen": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer" },
+              "naam": { "type": "string" },
+              "last_seen": {
+                "type": "string",
+                "description": "ISO timestamp of last presence update"
+              },
+              "online": {
+                "type": "boolean",
+                "description": "true when student is currently active (page focused)"
+              },
+              "focused": {
+                "type": "boolean",
+                "description": "same as online (kept for clarity)"
+              }
+            }
+          }
+        },
+        "scoreboard": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/ScoreboardEntry" }
+        },
+        "recentAnswers": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/RecentAnswer" }
+        }
+      }
+    },
+    "JoinResponse": {
+      "type": "object",
+      "properties": {
+        "ok": { "type": "boolean" },
+        "leerling_id": { "type": "integer" },
+        "klas_id": { "type": "integer" },
+        "klas_code": { "type": "string" }
+      }
+    },
+    "StudentState": {
+      "type": "object",
+      "properties": {
+        "session_id": { "type": "integer" },
+        "current_question_id": { "type": "integer" },
+        "question_text": { "type": "string" },
+        "already_answered": { "type": "boolean" },
+        "score": { "type": "number" },
+        "answer_count": { "type": "integer" },
+        "recent_answers": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/RecentAnswer" }
+        },
+        "session_ended": { "type": "boolean" }
+      }
+    },
+    "AnswerResponse": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean" },
+        "message": { "type": "string" }
+      }
+    }
+  }
+}

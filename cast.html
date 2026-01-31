@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8">
+    <title>Presentatie Scherm - Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="icon" type="image/x-icon" href="assets/img/logo2.png">
+    <script src="https://cdn.jsdelivr.net/npm/jdenticon@3.2.0/dist/jdenticon.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+        }
+        
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+        
+        .logo-section {
+            margin-bottom: 40px;
+        }
+        
+        .logo-section img {
+            max-width: 200px;
+            height: auto;
+            filter: brightness(0) invert(1);
+        }
+        
+        .question-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .question-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+        
+        .question-text {
+            font-size: 36px;
+            font-weight: 300;
+            line-height: 1.4;
+            margin-bottom: 30px;
+        }
+        
+        .answer-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .answer-option {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .answer-option:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .answer-option.selected {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #4CAF50;
+        }
+        
+        .answer-option.correct {
+            background: rgba(76, 175, 80, 0.5);
+            border-color: #4CAF50;
+        }
+        
+        .answer-option.incorrect {
+            background: rgba(244, 67, 54, 0.5);
+            border-color: #f44336;
+        }
+        
+        .answer-label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .timer-section {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px 25px;
+            font-size: 24px;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .session-info {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .session-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .session-class {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .waiting-screen {
+            text-align: center;
+        }
+        
+        .waiting-title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .waiting-subtitle {
+            font-size: 24px;
+            opacity: 0.8;
+            margin-bottom: 40px;
+        }
+        
+        .join-code {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px 40px;
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            margin-bottom: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .participants-section {
+            margin-top: 40px;
+        }
+        
+        .participants-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+        
+        .participants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .participant {
+            text-align: center;
+        }
+        
+        .participant-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .participant-name {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .results-section {
+            margin-top: 30px;
+        }
+        
+        .results-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .result-bar {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 30px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .result-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Session Info -->
+        <div class="session-info">
+            <div class="session-title" id="sessionTitle">Sessie</div>
+            <div class="session-class" id="sessionClass">Klas</div>
+        </div>
+        
+        <!-- Timer -->
+        <div class="timer-section hidden" id="timerSection">
+            <span id="timerDisplay">00:30</span>
+        </div>
+        
+        <!-- Waiting Screen -->
+        <div id="waitingScreen" class="waiting-screen">
+            <div class="logo-section">
+                <img src="assets/img/logo.png" alt="Overhoorder Logo">
+            </div>
+            <div class="waiting-title">Klaar om te beginnen!</div>
+            <div class="waiting-subtitle">Leerlingen kunnen nu joinen met de code:</div>
+            <div class="join-code pulse" id="joinCode">ABC123</div>
+            
+            <div class="participants-section">
+                <div class="participants-title">Deelnemers (<span id="participantCount">0</span>)</div>
+                <div class="participants-grid" id="participantsGrid"></div>
+            </div>
+        </div>
+        
+        <!-- Question Screen -->
+        <div id="questionScreen" class="question-section hidden">
+            <div class="question-number" id="questionNumber">Vraag 1</div>
+            <div class="question-text" id="questionText">Laad vraag...</div>
+            
+            <div class="answer-options" id="answerOptions"></div>
+            
+            <div class="results-section hidden" id="resultsSection">
+                <div class="results-title">Resultaten</div>
+                <div id="resultsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSession = null;
+        let participants = new Map();
+        let currentQuestion = null;
+        let timer = null;
+        
+        // Get session ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session');
+        
+        if (!sessionId) {
+            document.getElementById('waitingScreen').innerHTML = `
+                <div class="waiting-title">Geen sessie gevonden</div>
+                <div class="waiting-subtitle">Voeg een sessie ID toe aan de URL: ?session=123</div>
+            `;
+        } else {
+            connectToSession(sessionId);
+        }
+        
+        function connectToSession(sessionId) {
+            // Connect to SSE for real-time updates
+            const eventSource = new EventSource(`/sessies/${sessionId}/stream?token=${urlParams.get('token') || ''}`);
+            
+            eventSource.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                handleSessionUpdate(data);
+            };
+            
+            eventSource.onerror = function() {
+                console.error('SSE connection error');
+                setTimeout(() => connectToSession(sessionId), 5000);
+            };
+            
+            // Load initial session data
+            loadSessionData(sessionId);
+        }
+        
+        async function loadSessionData(sessionId) {
+            try {
+                const response = await fetch(`/sessies/${sessionId}?token=${urlParams.get('token') || ''}`);
+                if (!response.ok) return;
+                
+                const session = await response.json();
+                currentSession = session;
+                
+                // Update session info
+                document.getElementById('sessionTitle').textContent = session.vragenlijst_naam || 'Sessie';
+                document.getElementById('sessionClass').textContent = session.klas_naam || 'Klas';
+                document.getElementById('joinCode').textContent = session.klascode || 'ABC123';
+                
+                // Update participants
+                updateParticipants(session.leerlingen || []);
+                
+                // Show current question if available
+                if (session.currentQuestion) {
+                    showQuestion(session.currentQuestion);
+                }
+                
+            } catch (error) {
+                console.error('Load session error:', error);
+            }
+        }
+        
+        function handleSessionUpdate(data) {
+            switch (data.type) {
+                case 'question':
+                    showQuestion(data.payload);
+                    break;
+                case 'clear':
+                    clearQuestion();
+                    break;
+                case 'participants':
+                    updateParticipants(data.payload);
+                    break;
+                case 'results':
+                    showResults(data.payload);
+                    break;
+            }
+        }
+        
+        function updateParticipants(leerlingen) {
+            const grid = document.getElementById('participantsGrid');
+            const count = document.getElementById('participantCount');
+            
+            grid.innerHTML = '';
+            count.textContent = leerlingen.length;
+            
+            leerlingen.forEach(leerling => {
+                const participant = document.createElement('div');
+                participant.className = 'participant';
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'participant-avatar';
+                avatar.innerHTML = `<svg data-jdenticon-value="${leerling.naam || leerling.id}" width="60" height="60"></svg>`;
+                
+                const name = document.createElement('div');
+                name.className = 'participant-name';
+                name.textContent = leerling.naam || `Leerling ${leerling.id}`;
+                
+                participant.appendChild(avatar);
+                participant.appendChild(name);
+                grid.appendChild(participant);
+            });
+            
+            // Update identicons
+            jdenticon.update('.participant-avatar svg');
+        }
+        
+        function showQuestion(question) {
+            currentQuestion = question;
+            
+            // Hide waiting screen, show question screen
+            document.getElementById('waitingScreen').classList.add('hidden');
+            document.getElementById('questionScreen').classList.remove('hidden');
+            document.getElementById('timerSection').classList.remove('hidden');
+            
+            // Update question info
+            document.getElementById('questionNumber').textContent = `Vraag ${question.vraag_nummer || 1}`;
+            document.getElementById('questionText').textContent = question.vraag;
+            
+            // Update answer options
+            const optionsContainer = document.getElementById('answerOptions');
+            optionsContainer.innerHTML = '';
+            
+            const options = [
+                { label: 'A', text: question.antwoord_a },
+                { label: 'B', text: question.antwoord_b },
+                { label: 'C', text: question.antwoord_c },
+                { label: 'D', text: question.antwoord_d }
+            ].filter(option => option.text);
+            
+            options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'answer-option';
+                optionDiv.id = `option-${index}`;
+                
+                optionDiv.innerHTML = `
+                    <div class="answer-label">${option.label}</div>
+                    <div>${option.text}</div>
+                `;
+                
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            // Hide results initially
+            document.getElementById('resultsSection').classList.add('hidden');
+            
+            // Start timer if needed
+            if (question.timer) {
+                startTimer(question.timer);
+            }
+        }
+        
+        function clearQuestion() {
+            document.getElementById('questionScreen').classList.add('hidden');
+            document.getElementById('waitingScreen').classList.remove('hidden');
+            document.getElementById('timerSection').classList.add('hidden');
+            
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+        }
+        
+        function showResults(results) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.innerHTML = '';
+            
+            // Show results section
+            document.getElementById('resultsSection').classList.remove('hidden');
+            
+            // Calculate results for each option
+            const options = ['A', 'B', 'C', 'D'];
+            const total = Object.values(results).reduce((sum, count) => sum + count, 0);
+            
+            options.forEach(option => {
+                const count = results[option] || 0;
+                const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+                
+                const resultBar = document.createElement('div');
+                resultBar.className = 'result-bar';
+                
+                const resultFill = document.createElement('div');
+                resultFill.className = 'result-fill';
+                resultFill.style.width = `${percentage}%`;
+                resultFill.textContent = `${option}: ${count} (${percentage}%)`;
+                
+                resultBar.appendChild(resultFill);
+                resultsContainer.appendChild(resultBar);
+            });
+            
+            // Highlight correct answer
+            if (currentQuestion && currentQuestion.correct_answer) {
+                const correctOption = document.getElementById(`option-${currentQuestion.correct_answer.charCodeAt(0) - 65}`);
+                if (correctOption) {
+                    correctOption.classList.add('correct');
+                }
+            }
+        }
+        
+        function startTimer(seconds) {
+            let timeLeft = seconds;
+            const timerDisplay = document.getElementById('timerDisplay');
+            
+            if (timer) clearInterval(timer);
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const secs = timeLeft % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+            }, 1000);
+        }
+        
+        // Fullscreen support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'f' || e.key === 'F') {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

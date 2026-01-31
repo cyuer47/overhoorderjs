@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Licentie Beheer - Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="icon" type="image/x-icon" href="assets/img/logo2.png" />
+    <script>
+      !(function (t, e) {
+        var o, n, p, r;
+        e.__SV ||
+          (window.posthog && window.posthog.__loaded) ||
+          ((window.posthog = e),
+          (e._i = []),
+          (e.init = function (i, s, a) {
+            function g(t, e) {
+              var o = e.split(".");
+              (2 == o.length && ((t = t[o[0]]), (e = o[1])),
+                (t[e] = function () {
+                  t.push([e].concat(Array.prototype.slice.call(arguments, 0)));
+                }));
+            }
+            (((p = t.createElement("script")).type = "text/javascript"),
+              (p.crossOrigin = "anonymous"),
+              (p.async = !0),
+              (p.src =
+                s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") +
+                "/static/array.js"),
+              (r = t.getElementsByTagName("script")[0]).parentNode.insertBefore(
+                p,
+                r,
+              ));
+            var u = e;
+            for (
+              void 0 !== a ? (u = e[a] = []) : (a = "posthog"),
+                u.people = u.people || [],
+                u.toString = function (t) {
+                  var e = "posthog";
+                  return (
+                    "posthog" !== a && (e += "." + a),
+                    t || (e += " (stub)"),
+                    e
+                  );
+                },
+                u.people.toString = function () {
+                  return u.toString(1) + ".people (stub)";
+                },
+                o =
+                  "init Ce js Ls Te Fs Ds capture Ye calculateEventProperties zs register register_once register_for_session unregister unregister_for_session Ws getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty Bs Us createPersonProfile Hs Ms Gs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Ns debug L qs getPageViewId captureTraceFeedback captureTraceMetric".split(
+                    " ",
+                  ),
+                n = 0;
+              n < o.length;
+              n++
+            )
+              g(u, o[n]);
+            e._i.push([i, s, a]);
+          }),
+          (e.__SV = 1));
+      })(document, window.posthog || []);
+      posthog.init("phc_bjbHSOWX3nTZKHLlw7SSkutWkjSfTV38ewAcRmxPsYN", {
+        api_host: "https://eu.i.posthog.com",
+        defaults: "2025-05-24",
+        person_profiles: "always",
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container" style="max-width: 1200px; margin: 40px auto">
+      <a class="btn-text" href="dashboard.html">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#2B225C"
+        >
+          <path
+            d="m368-417 202 202-90 89-354-354 354-354 90 89-202 202h466v126H368Z"
+          />
+        </svg>
+        Terug naar Dashboard
+      </a>
+
+      <div class="card">
+        <h1>Licentie Beheer</h1>
+
+        <div id="error" style="color: red; display: none"></div>
+        <div id="message" style="color: green; display: none"></div>
+
+        <!-- Licentie aanmaken formulier -->
+        <div class="form-section">
+          <h2>Nieuwe Licentie Aanmaken</h2>
+          <form id="licentieForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="docentSelect">Docent:</label>
+                <select id="docentSelect" name="docent_id" required>
+                  <option value="">Selecteer een docent...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="aantalVragenlijsten">Aantal Vragenlijsten:</label>
+                <input
+                  type="number"
+                  id="aantalVragenlijsten"
+                  name="aantal_vragenlijsten"
+                  min="1"
+                  value="10"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="vervaltOp">Vervalt op (optioneel):</label>
+                <input type="date" id="vervaltOp" name="vervalt_op" />
+              </div>
+            </div>
+            <button type="submit" class="btn-primary">Licentie Aanmaken</button>
+          </form>
+        </div>
+
+        <!-- Docenten lijst -->
+        <div class="table-section">
+          <h2>Docenten en Licenties</h2>
+          <table id="docentenTable">
+            <thead>
+              <tr>
+                <th>Naam</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Klassen</th>
+                <th>Licenties</th>
+                <th>Acties</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentUser = null;
+
+      // Check authentication
+      async function checkAuth() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        try {
+          const response = await fetch("/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (!response.ok) {
+            localStorage.removeItem("token");
+            window.location.href = "login.html";
+            return;
+          }
+
+          currentUser = await response.json();
+          console.log("admin_licenties currentUser:", currentUser);
+
+          // Check if user is admin (role or id=1 fallback) — coerce id to number for robustness
+          if (currentUser.rol !== "admin" && Number(currentUser.id) !== 1) {
+            showError("Alleen admins hebben toegang tot deze pagina.");
+            setTimeout(() => (window.location.href = "dashboard.html"), 2000);
+            return;
+          }
+
+          loadDocenten();
+        } catch (error) {
+          console.error("Auth error:", error);
+          window.location.href = "login.html";
+        }
+      }
+
+      // Load all docenten
+      async function loadDocenten() {
+        try {
+          const response = await fetch("/admin/docenten", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+
+          if (!response.ok) throw new Error("Failed to load docenten");
+
+          const docenten = await response.json();
+
+          // Populate docent select
+          const docentSelect = document.getElementById("docentSelect");
+          docenten.forEach((docent) => {
+            if (docent.rol !== "admin") {
+              const option = document.createElement("option");
+              option.value = docent.id;
+              option.textContent = `${docent.naam || docent.email} (${docent.email})`;
+              docentSelect.appendChild(option);
+            }
+          });
+
+          // Populate table
+          const tbody = document.querySelector("#docentenTable tbody");
+          tbody.innerHTML = "";
+
+          docenten.forEach((docent) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${docent.naam || "-"}</td>
+                <td>${docent.email}</td>
+                <td><span class="badge ${docent.rol === "admin" ? "badge-admin" : "badge-docent"}">${docent.rol}</span></td>
+                <td>${docent.aantal_klassen || 0}</td>
+                <td><button onclick="loadLicenties(${docent.id})" class="btn-text">Bekijken</button></td>
+                <td>
+                    ${
+                      docent.rol !== "admin"
+                        ? `
+                        <button onclick="loadLicenties(${docent.id})" class="btn-primary">Licenties</button>
+                    `
+                        : "-"
+                    }
+                </td>
+            `;
+            tbody.appendChild(row);
+          });
+        } catch (error) {
+          console.error("Load docenten error:", error);
+          showError("Fout bij het laden van docenten.");
+        }
+      }
+
+      // Load licenties for specific docent
+      async function loadLicenties(docentId) {
+        try {
+          const response = await fetch(`/admin/licenties/${docentId}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+
+          if (!response.ok) throw new Error("Failed to load licenties");
+
+          const licenties = await response.json();
+
+          // Create modal or show in table
+          let licentieHtml =
+            "<h3>Licenties</h3><table><thead><tr><th>ID</th><th>Aantal Vragenlijsten</th><th>Klas</th><th>Vervalt op</th><th>Status</th><th>Acties</th></tr></thead><tbody>";
+
+          licenties.forEach((licentie) => {
+            const status = licentie.actief ? "Actief" : "Inactief";
+            const klasNaam = licentie.klas_naam || "Niet toegewezen";
+            const vervaltOp = licentie.vervalt_op
+              ? new Date(licentie.vervalt_op).toLocaleDateString("nl-NL")
+              : "Nooit";
+
+            licentieHtml += `
+                <tr>
+                    <td>${licentie.id}</td>
+                    <td>${licentie.aantal_vragenlijsten}</td>
+                    <td>${klasNaam}</td>
+                    <td>${vervaltOp}</td>
+                    <td><span class="badge ${licentie.actief ? "badge-active" : "badge-inactive"}">${status}</span></td>
+                    <td>
+                        ${!licentie.klas_id ? `<button onclick="deleteLicentie(${licentie.id})" class="btn-danger">Verwijderen</button>` : "-"}
+                    </td>
+                </tr>
+            `;
+          });
+
+          licentieHtml += "</tbody></table>";
+
+          // Show in modal or replace content
+          const modal = document.createElement("div");
+          modal.className = "modal";
+          modal.innerHTML = `
+            <div class="modal-content">
+                ${licentieHtml}
+                <button onclick="this.parentElement.parentElement.remove()" class="btn-primary">Sluiten</button>
+            </div>
+        `;
+          document.body.appendChild(modal);
+        } catch (error) {
+          console.error("Load licenties error:", error);
+          showError("Fout bij het laden van licenties.");
+        }
+      }
+
+      // Delete licentie
+      async function deleteLicentie(licentieId) {
+        if (!confirm("Weet je zeker dat je deze licentie wilt verwijderen?"))
+          return;
+
+        try {
+          const response = await fetch(`/admin/licenties/${licentieId}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Failed to delete licentie");
+          }
+
+          showMessage("Licentie succesvol verwijderd.");
+          // Close the modal (if open) and refresh the docent list
+          const modal = document.querySelector(".modal");
+          if (modal) modal.remove();
+          loadDocenten();
+        } catch (error) {
+          console.error("Delete licentie error:", error);
+          showError(
+            error.message || "Fout bij het verwijderen van de licentie.",
+          );
+        }
+      }
+
+      // Form submission
+      document
+        .getElementById("licentieForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData(e.target);
+          const data = Object.fromEntries(formData.entries());
+
+          try {
+            const response = await fetch("/admin/licenties", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+              body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+              const error = await response.json();
+              throw new Error(error.error || "Failed to create licentie");
+            }
+
+            showMessage("Licentie succesvol aangemaakt!");
+            e.target.reset();
+          } catch (error) {
+            console.error("Create licentie error:", error);
+            showError(
+              error.message || "Fout bij het aanmaken van de licentie.",
+            );
+          }
+        });
+
+      function showError(message) {
+        const errorDiv = document.getElementById("error");
+        errorDiv.textContent = message;
+        errorDiv.style.display = "block";
+        document.getElementById("message").style.display = "none";
+      }
+
+      function showMessage(message) {
+        const messageDiv = document.getElementById("message");
+        messageDiv.textContent = message;
+        messageDiv.style.display = "block";
+        document.getElementById("error").style.display = "none";
+      }
+
+      // Add some basic styles for badges and modal
+      const style = document.createElement("style");
+      style.textContent = `
+    .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .badge-admin { background-color: #007bff; color: white; }
+    .badge-docent { background-color: #6c757d; color: white; }
+    .badge-active { background-color: #28a745; color: white; }
+    .badge-inactive { background-color: #dc3545; color: white; }
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 800px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    .form-section, .table-section {
+        margin-bottom: 30px;
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .form-group label {
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    .form-group input, .form-group select {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+`;
+      document.head.appendChild(style);
+
+      // Initialize on page load
+      checkAuth();
+    </script>
+  </body>
+</html>

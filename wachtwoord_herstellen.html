@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Wachtwoord Herstellen - Overhoorder</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="assets/img/logo2.png" />
+    <script>
+      !(function (t, e) {
+        var o, n, p, r;
+        e.__SV ||
+          (window.posthog && window.posthog.__loaded) ||
+          ((window.posthog = e),
+          (e._i = []),
+          (e.init = function (i, s, a) {
+            function g(t, e) {
+              var o = e.split(".");
+              (2 == o.length && ((t = t[o[0]]), (e = o[1])),
+                (t[e] = function () {
+                  t.push([e].concat(Array.prototype.slice.call(arguments, 0)));
+                }));
+            }
+            (((p = t.createElement("script")).type = "text/javascript"),
+              (p.crossOrigin = "anonymous"),
+              (p.async = !0),
+              (p.src =
+                s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") +
+                "/static/array.js"),
+              (r = t.getElementsByTagName("script")[0]).parentNode.insertBefore(
+                p,
+                r,
+              ));
+            var u = e;
+            for (
+              void 0 !== a ? (u = e[a] = []) : (a = "posthog"),
+                u.people = u.people || [],
+                u.toString = function (t) {
+                  var e = "posthog";
+                  return (
+                    "posthog" !== a && (e += "." + a),
+                    t || (e += " (stub)"),
+                    e
+                  );
+                },
+                u.people.toString = function () {
+                  return u.toString(1) + ".people (stub)";
+                },
+                o =
+                  "init Ce js Ls Te Fs Ds capture Ye calculateEventProperties zs register register_once register_for_session unregister unregister_for_session Ws getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty Bs Us createPersonProfile Hs Ms Gs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Ns debug L qs getPageViewId captureTraceFeedback captureTraceMetric".split(
+                    " ",
+                  ),
+                n = 0;
+              n < o.length;
+              n++
+            )
+              g(u, o[n]);
+            e._i.push([i, s, a]);
+          }),
+          (e.__SV = 1));
+      })(document, window.posthog || []);
+      posthog.init("phc_bjbHSOWX3nTZKHLlw7SSkutWkjSfTV38ewAcRmxPsYN", {
+        api_host: "https://eu.i.posthog.com",
+        defaults: "2025-05-24",
+        person_profiles: "always",
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="container card" style="max-width: 420px; margin: 40px auto">
+        <div style="margin-bottom: 12px">
+          <a href="login.html" class="btn-text">Terug naar inloggen</a>
+        </div>
+
+        <h2>Wachtwoord Herstellen</h2>
+        <p style="margin-bottom: 16px">
+          Kies een nieuw wachtwoord voor je account
+        </p>
+
+        <div id="error" style="color: var(--error); display: none"></div>
+        <div id="message" style="color: green; display: none"></div>
+
+        <div id="loading" style="text-align: center; padding: 20px">
+          <div
+            style="
+              height: 20px;
+              width: 200px;
+              margin: 0 auto 16px;
+              border-radius: 4px;
+              background: linear-gradient(90deg, #f0f0f0, #e9e9e9);
+            "
+          ></div>
+          <p>Bezig met controleren...</p>
+        </div>
+
+        <form id="resetForm" style="display: none">
+          <input type="hidden" id="token" name="token" />
+
+          <label for="new_password">Nieuw wachtwoord</label>
+          <input
+            type="password"
+            id="new_password"
+            name="new_password"
+            required
+            placeholder="Minimaal 6 tekens"
+          />
+
+          <label for="confirm_password">Bevestig nieuw wachtwoord</label>
+          <input
+            type="password"
+            id="confirm_password"
+            name="confirm_password"
+            required
+            placeholder="Voer wachtwoord opnieuw in"
+          />
+
+          <div style="margin-top: 16px">
+            <button type="submit" class="btn-primary" style="width: 100%">
+              Wachtwoord wijzigen
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Get token from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get("token");
+
+      // DOM elements
+      const loadingDiv = document.getElementById("loading");
+      const resetForm = document.getElementById("resetForm");
+      const errorDiv = document.getElementById("error");
+      const messageDiv = document.getElementById("message");
+      const tokenInput = document.getElementById("token");
+
+      // Initialize
+      if (!token) {
+        showError(
+          "Geen herstellink gevonden. Controleer de link die je hebt ontvangen.",
+        );
+      } else {
+        tokenInput.value = token;
+        validateToken();
+      }
+
+      // Form submission
+      resetForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const newPassword = document.getElementById("new_password").value;
+        const confirmPassword =
+          document.getElementById("confirm_password").value;
+
+        // Client-side validation
+        if (newPassword !== confirmPassword) {
+          showError("Wachtwoorden komen niet overeen.");
+          return;
+        }
+
+        if (newPassword.length < 6) {
+          showError("Het wachtwoord moet minstens 6 tekens lang zijn.");
+          return;
+        }
+
+        // Show loading state
+        const submitBtn = resetForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Bezig met wijzigen...";
+
+        try {
+          // For demo: simulate password update
+          // In production, you would send this to your backend
+          let userEmail = null;
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith("reset_token_")) {
+              const data = JSON.parse(localStorage.getItem(key));
+              if (data.token === token) {
+                userEmail = key.replace("reset_token_", "");
+                break;
+              }
+            }
+          }
+
+          if (userEmail) {
+            // Simulate successful password update
+            console.log(`Password updated for ${userEmail}: ${newPassword}`);
+
+            // Remove the token
+            localStorage.removeItem(`reset_token_${userEmail}`);
+
+            showMessage(
+              "Je wachtwoord is succesvol gewijzigd. Je kunt nu inloggen.",
+            );
+            resetForm.style.display = "none";
+            loadingDiv.style.display = "none";
+
+            // Redirect to login after 2 seconds
+            setTimeout(() => {
+              window.location.href = "login.html";
+            }, 2000);
+          } else {
+            showError("Ongeldige of verlopen herstellink.");
+          }
+        } catch (error) {
+          showError("Er is een fout opgetreden. Probeer het opnieuw.");
+          console.error("Reset password error:", error);
+        } finally {
+          // Reset button state
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Wachtwoord wijzigen";
+        }
+      });
+
+      function validateToken() {
+        try {
+          // Zoek de token in localStorage
+          let validToken = false;
+
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith("reset_token_")) {
+              const data = JSON.parse(localStorage.getItem(key));
+              if (data.token === token) {
+                // Controleer of token niet verlopen is
+                const expiry = new Date(data.expiry);
+                const now = new Date();
+
+                if (now <= expiry) {
+                  validToken = true;
+                  break;
+                }
+              }
+            }
+          }
+
+          loadingDiv.style.display = "none";
+
+          if (validToken) {
+            resetForm.style.display = "block";
+          } else {
+            showError("Ongeldige of verlopen herstellink.");
+          }
+        } catch (error) {
+          loadingDiv.style.display = "none";
+          showError("Er is een fout opgetreden. Probeer het opnieuw.");
+          console.error("Token validation error:", error);
+        }
+      }
+
+      function showError(message) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = "block";
+        messageDiv.style.display = "none";
+        loadingDiv.style.display = "none";
+        resetForm.style.display = "none";
+      }
+
+      function showMessage(message) {
+        messageDiv.textContent = message;
+        messageDiv.style.display = "block";
+        errorDiv.style.display = "none";
+      }
+    </script>
+  </body>
+</html>
